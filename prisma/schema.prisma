@@ -7,17 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model OrderStatus {
-  id          String   @id @default(uuid())
-  status_name String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  Order Order[]
+enum UserLevel {
+  USER
+  ADMIN
 }
 
 model User {
-  id              String   @id @default(uuid())
+  id              String   @id @default(uuid()) @db.Uuid
   name            String
   email           String   @unique
   password        String
@@ -27,28 +23,15 @@ model User {
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 
-  Order Order[]
-  Media Media?  @relation(fields: [avatar_media_id], references: [id])
-}
+  UserLevel UserLevel @default(USER)
+  Order     Order[]
+  Product   Product[]
 
-model Order {
-  id         String   @id @default(uuid())
-  user_id    String
-  amount     Float
-  notes      String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  status_id  String
-
-  User        User        @relation(fields: [user_id], references: [id])
-  OrderStatus OrderStatus @relation(fields: [status_id], references: [id])
-  OrderItem   OrderItem[]
-  Payment     Payment?
-  Shipping    Shipping?
+  @@index([email, id])
 }
 
 model Product {
-  id               String    @id @default(uuid())
+  id               String    @id @default(uuid()) @db.Uuid
   product_name     String
   slug             String    @unique
   description      String
@@ -58,13 +41,76 @@ model Product {
   created_at       DateTime  @default(now())
   deleted_at       DateTime?
 
-  OrderItem OrderItem[]
-  Stock     Stock?
-  Media     Media?      @relation(fields: [product_image_id], references: [id])
+  created_by_id String      @default(uuid()) @db.Uuid
+  OrderItem     OrderItem[]
+  Stock         Stock?
+  User          User?       @relation(fields: [userId], references: [id])
+  userId        String?     @db.Uuid
+
+  @@index([slug, id])
+}
+
+enum StockType {
+  OUT_SALES
+  IN_SALES
+  RETUR
+}
+
+model StockHistory {
+  id          String    @id @default(uuid()) @db.Uuid
+  stock_id    String    @unique @db.Uuid
+  type        StockType
+  notes       String?
+  amount      Int
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  external_id String?
+
+  Stock Stock @relation(fields: [stock_id], references: [id])
+
+  @@index([stock_id])
+}
+
+model Stock {
+  id         String   @id @default(uuid()) @db.Uuid
+  product_id String   @unique @db.Uuid
+  stock      Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  Product      Product        @relation(fields: [product_id], references: [id])
+  StockHistory StockHistory[]
+
+  @@index([product_id])
+}
+
+enum OrderStatus {
+  PENDING
+  SUCCESS
+  CANCEL
+}
+
+model Order {
+  id           String   @id @default(uuid()) @db.Uuid
+  user_id      String
+  order_number String   @unique
+  amount       Float
+  notes        String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  status_id    String
+
+  User        User        @relation(fields: [user_id], references: [id])
+  OrderStatus OrderStatus @default(PENDING)
+  OrderItem   OrderItem[]
+  Payment     Payment?
+  Shipping    Shipping?
+
+  @@index([order_number, id, user_id])
 }
 
 model OrderItem {
-  id            String   @id @default(uuid())
+  id            String   @id @default(uuid()) @db.Uuid
   order_id      String
   product_id    String
   amount        Float
@@ -75,31 +121,18 @@ model OrderItem {
 
   Order   Order   @relation(fields: [order_id], references: [id])
   Product Product @relation(fields: [product_id], references: [id])
+
+  @@index([order_id, id])
 }
 
-model Payment {
-  id         String   @id @default(uuid())
-  order_id   String   @unique
-  amount     Float
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  status_id  String
-
-  Order         Order         @relation(fields: [order_id], references: [id])
-  PaymentStatus PaymentStatus @relation(fields: [status_id], references: [id])
-}
-
-model PaymentStatus {
-  id          String   @id @default(uuid())
-  status_name String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  Payment Payment[]
+enum ShippingStatus {
+  PENDING
+  SUCCESS
+  CANCEL
 }
 
 model Shipping {
-  id              String   @id @default(uuid())
+  id              String   @id @default(uuid()) @db.Uuid
   order_id        String   @unique
   receive_address String
   receive_email   String
@@ -110,63 +143,41 @@ model Shipping {
   status_id       String
 
   Order          Order          @relation(fields: [order_id], references: [id])
-  ShippingStatus ShippingStatus @relation(fields: [status_id], references: [id])
+  ShippingStatus ShippingStatus @default(PENDING)
+
+  @@index([order_id, id, ShippingStatus])
 }
 
-model ShippingStatus {
-  id          String   @id @default(uuid())
-  status_name String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  Shipping Shipping[]
+enum PaymentStatus {
+  PENDING
+  FAILED
+  SUCCESS
+  CANCEL
+  UNPAID
+  PAID
+  REFUND
 }
 
-model Media {
-  id          String   @id @default(uuid())
-  media_name  String
-  description String?
-  bucket_path String
-  full_url    String
-  extension   String
-  size        Int
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  User    User[]
-  Product Product[]
+enum PaymenMethod {
+  CREDIT
+  BANK
+  EWALLET
+  CASH
 }
 
-model Stock {
-  id         String   @id @default(uuid())
-  product_id String   @unique
-  stock      Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+model Payment {
+  id                     String   @id @default(uuid())
+  order_id               String   @unique
+  amount                 Float
+  created_at             DateTime @default(now())
+  updated_at             DateTime @updatedAt
+  notes                  String?
+  payment_image          String?
+  payment_image_media_id String?
 
-  Product      Product        @relation(fields: [product_id], references: [id])
-  StockHistory StockHistory[]
-}
+  Order         Order         @relation(fields: [order_id], references: [id])
+  PaymentStatus PaymentStatus @default(UNPAID)
+  PaymenMethod  PaymenMethod  @default(BANK)
 
-model StockHistory {
-  id          String   @id @default(uuid())
-  stock_id    String
-  type        String
-  notes       String?
-  amount      Int
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-  external_id String?
-
-  Stock Stock @relation(fields: [stock_id], references: [id])
-}
-
-model Notification {
-  id         String   @id @default(uuid())
-  notif_type String
-  content    String
-  send_to    String
-  status     String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  @@index([order_id, id, PaymentStatus])
 }
