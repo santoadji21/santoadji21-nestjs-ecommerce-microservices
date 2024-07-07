@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,4 +5,168 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model OrderStatus {
+  id          String   @id @default(uuid())
+  status_name String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  Order Order[]
+}
+
+model User {
+  id              String   @id @default(uuid())
+  name            String
+  email           String   @unique
+  password        String
+  phone           String?
+  avatar          String?
+  avatar_media_id String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  Order Order[]
+  Media Media?  @relation(fields: [avatar_media_id], references: [id])
+}
+
+model Order {
+  id         String   @id @default(uuid())
+  user_id    String
+  amount     Float
+  notes      String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  status_id  String
+
+  User        User        @relation(fields: [user_id], references: [id])
+  OrderStatus OrderStatus @relation(fields: [status_id], references: [id])
+  OrderItem   OrderItem[]
+  Payment     Payment?
+  Shipping    Shipping?
+}
+
+model Product {
+  id               String    @id @default(uuid())
+  product_name     String
+  slug             String    @unique
+  description      String
+  price            Float
+  product_image    String?
+  product_image_id String?
+  created_at       DateTime  @default(now())
+  deleted_at       DateTime?
+
+  OrderItem OrderItem[]
+  Stock     Stock?
+  Media     Media?      @relation(fields: [product_image_id], references: [id])
+}
+
+model OrderItem {
+  id            String   @id @default(uuid())
+  order_id      String
+  product_id    String
+  amount        Float
+  price_product Float
+  qty           Int
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  Order   Order   @relation(fields: [order_id], references: [id])
+  Product Product @relation(fields: [product_id], references: [id])
+}
+
+model Payment {
+  id         String   @id @default(uuid())
+  order_id   String   @unique
+  amount     Float
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  status_id  String
+
+  Order         Order         @relation(fields: [order_id], references: [id])
+  PaymentStatus PaymentStatus @relation(fields: [status_id], references: [id])
+}
+
+model PaymentStatus {
+  id          String   @id @default(uuid())
+  status_name String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  Payment Payment[]
+}
+
+model Shipping {
+  id              String   @id @default(uuid())
+  order_id        String   @unique
+  receive_address String
+  receive_email   String
+  receive_name    String
+  receive_phone   String
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  status_id       String
+
+  Order          Order          @relation(fields: [order_id], references: [id])
+  ShippingStatus ShippingStatus @relation(fields: [status_id], references: [id])
+}
+
+model ShippingStatus {
+  id          String   @id @default(uuid())
+  status_name String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  Shipping Shipping[]
+}
+
+model Media {
+  id          String   @id @default(uuid())
+  media_name  String
+  description String?
+  bucket_path String
+  full_url    String
+  extension   String
+  size        Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  User    User[]
+  Product Product[]
+}
+
+model Stock {
+  id         String   @id @default(uuid())
+  product_id String   @unique
+  stock      Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  Product      Product        @relation(fields: [product_id], references: [id])
+  StockHistory StockHistory[]
+}
+
+model StockHistory {
+  id          String   @id @default(uuid())
+  stock_id    String
+  type        String
+  notes       String?
+  amount      Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  external_id String?
+
+  Stock Stock @relation(fields: [stock_id], references: [id])
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  notif_type String
+  content    String
+  send_to    String
+  status     String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
