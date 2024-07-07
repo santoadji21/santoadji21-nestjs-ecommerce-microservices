@@ -1,0 +1,111 @@
+http:
+  routers:
+    auth:
+      rule: 'PathPrefix(`/auth`)'
+      service: auth-service
+      entryPoints:
+        - web
+      middlewares:
+        - strip-auth-prefix
+    orders:
+      rule: 'PathPrefix(`/orders`)'
+      service: orders-service
+      entryPoints:
+        - web
+      middlewares:
+        - strip-orders-prefix
+    medias:
+      rule: 'PathPrefix(`/medias`)'
+      service: medias-service
+      entryPoints:
+        - web
+      middlewares:
+        - strip-medias-prefix
+    payments:
+      rule: 'PathPrefix(`/payments`)'
+      service: payments-service
+      entryPoints:
+        - web
+      middlewares:
+        - strip-payments-prefix
+    notifications:
+      rule: 'PathPrefix(`/notifications`)'
+      service: notifications-service
+      entryPoints:
+        - web
+      middlewares:
+        - strip-notifications-prefix
+    products:
+      rule: 'PathPrefix(`/products`)'
+      service: products-service
+      entryPoints:
+        - web
+      middlewares:
+        - strip-products-prefix
+    shipping:
+      rule: 'PathPrefix(`/shipping`)'
+      service: shipping-service
+      entryPoints:
+        - web
+      middlewares:
+        - strip-shipping-prefix
+
+  services:
+    auth-service:
+      loadBalancer:
+        servers:
+          - url: 'http://auth:3000'
+    orders-service:
+      loadBalancer:
+        servers:
+          - url: 'http://orders:3000'
+    medias-service:
+      loadBalancer:
+        servers:
+          - url: 'http://medias:3000'
+    payments-service:
+      loadBalancer:
+        servers:
+          - url: 'http://payments:3000'
+    notifications-service:
+      loadBalancer:
+        servers:
+          - url: 'http://notifications:3000'
+    products-service:
+      loadBalancer:
+        servers:
+          - url: 'http://products:3000'
+    shipping-service:
+      loadBalancer:
+        servers:
+          - url: 'http://shipping:3000'
+
+  middlewares:
+    strip-auth-prefix:
+      stripPrefix:
+        prefixes:
+          - '/auth'
+    strip-orders-prefix:
+      stripPrefix:
+        prefixes:
+          - '/orders'
+    strip-medias-prefix:
+      stripPrefix:
+        prefixes:
+          - '/medias'
+    strip-payments-prefix:
+      stripPrefix:
+        prefixes:
+          - '/payments'
+    strip-notifications-prefix:
+      stripPrefix:
+        prefixes:
+          - '/notifications'
+    strip-products-prefix:
+      stripPrefix:
+        prefixes:
+          - '/products'
+    strip-shipping-prefix:
+      stripPrefix:
+        prefixes:
+          - '/shipping'
