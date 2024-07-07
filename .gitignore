@@ -2,7 +2,13 @@
 /dist
 /node_modules
 /build
-
+/apps/auth/node_modules
+/apps/medias/node_modules
+/apps/orders/node_modules
+/apps/payments/node_modules
+/apps/notifications/node_modules
+/apps/products/node_modules
+/apps/shipping/node_modules
 # Logs
 logs
 *.log

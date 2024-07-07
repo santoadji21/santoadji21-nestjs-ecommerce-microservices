@@ -16,8 +16,8 @@
     "**/.classpath": true,
     "**/.project": true,
     "**/.settings": true,
-    "**/.factorypath": true,
-    "**/node_modules": true
+    "**/.factorypath": true
+    // "**/node_modules": true
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[prisma]": {
