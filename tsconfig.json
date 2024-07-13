@@ -18,12 +18,14 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/common": [
-        "libs/common/src"
-      ],
-      "@app/common/*": [
-        "libs/common/src/*"
-      ]
+      "@app/common/*": ["libs/common/src/*"],
+      "@app/auth/*": ["apps/auth/src/*"],
+      "@app/products/*": ["apps/products/src/*"],
+      "@app/orders/*": ["apps/orders/src/*"],
+      "@app/medias/*": ["apps/medias/src/*"],
+      "@app/shipping/*": ["apps/shipping/src/*"],
+      "@app/payments/*": ["apps/payments/src/*"],
+      "@app/notifications/*": ["apps/notifications/src/*"]
     }
   }
 }

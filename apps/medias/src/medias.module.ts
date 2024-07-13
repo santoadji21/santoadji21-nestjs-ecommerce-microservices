@@ -1,6 +1,6 @@
+import { MediasController } from '@app/medias/medias.controller';
+import { MediasService } from '@app/medias/medias.service';
 import { Module } from '@nestjs/common';
-import { MediasController } from './medias.controller';
-import { MediasService } from './medias.service';
 
 @Module({
   imports: [],

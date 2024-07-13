@@ -1,5 +1,6 @@
+import 'tsconfig-paths/register';
+import { ShippingModule } from '@app/shipping/shipping.module';
 import { NestFactory } from '@nestjs/core';
-import { ShippingModule } from './shipping.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(ShippingModule);

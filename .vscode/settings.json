@@ -16,8 +16,9 @@
     "**/.classpath": true,
     "**/.project": true,
     "**/.settings": true,
-    "**/.factorypath": true
-    // "**/node_modules": true
+    "**/.factorypath": true,
+    "**/node_modules": true,
+    "**/dist": true
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[prisma]": {
@@ -25,7 +26,8 @@
   },
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "workbench.editor.customLabels.patterns": {
-    "**/apps/**/Dockerfile": "${filename}-${dirname}",
-    "**/apps/**/.env": "${filename}-${dirname}"
+    "**/apps/*/src/main.ts": "${filename}-${dirname(1)}",
+    "**/apps/*/Dockerfile": "${filename}-${dirname}",
+    "**/apps/*/.env": "${filename}-${dirname}"
   }
 }

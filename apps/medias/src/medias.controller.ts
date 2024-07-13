@@ -1,5 +1,5 @@
+import { MediasService } from '@app/medias/medias.service';
 import { Controller, Get } from '@nestjs/common';
-import { MediasService } from './medias.service';
 
 @Controller()
 export class MediasController {

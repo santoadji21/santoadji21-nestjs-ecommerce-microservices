@@ -7,177 +7,170 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserLevel {
-  USER
+enum USER_LEVEL {
   ADMIN
+  MEMBER
 }
 
-model User {
-  id              String   @id @default(uuid()) @db.Uuid
+model user {
+  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name            String
-  email           String   @unique
+  email           String          @unique
   password        String
   phone           String?
   avatar          String?
   avatar_media_id String?
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  user_level      USER_LEVEL      @default(MEMBER)
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @default(now()) @updatedAt
+  product         product[]
+  stock_history   stock_history[]
+  order           order[]
 
-  UserLevel UserLevel @default(USER)
-  Order     Order[]
-  Product   Product[]
-
-  @@index([email, id])
+  @@index([id, email])
 }
 
-model Product {
-  id               String    @id @default(uuid()) @db.Uuid
+model product {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   product_name     String
-  slug             String    @unique
+  slug             String
   description      String
-  price            Float
+  price            Int       @default(0)
   product_image    String?
   product_image_id String?
+  created_by_id    String    @db.Uuid
+  is_active        Boolean   @default(false)
   created_at       DateTime  @default(now())
+  updated_at       DateTime  @default(now()) @updatedAt
   deleted_at       DateTime?
 
-  created_by_id String      @default(uuid()) @db.Uuid
-  OrderItem     OrderItem[]
-  Stock         Stock?
-  User          User?       @relation(fields: [userId], references: [id])
-  userId        String?     @db.Uuid
+  created_by user         @relation(fields: [created_by_id], references: [id])
+  stock      stock[]
+  order_item order_item[]
 
-  @@index([slug, id])
+  @@index([id, created_by_id, slug, is_active])
 }
 
-enum StockType {
-  OUT_SALES
-  IN_SALES
-  RETUR
-}
-
-model StockHistory {
-  id          String    @id @default(uuid()) @db.Uuid
-  stock_id    String    @unique @db.Uuid
-  type        StockType
-  notes       String?
-  amount      Int
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
-  external_id String?
-
-  Stock Stock @relation(fields: [stock_id], references: [id])
-
-  @@index([stock_id])
-}
-
-model Stock {
-  id         String   @id @default(uuid()) @db.Uuid
-  product_id String   @unique @db.Uuid
-  stock      Int
+model stock {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  product_id String   @db.Uuid
+  stock      Int      @default(0)
   created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  updated_at DateTime @default(now()) @updatedAt
 
-  Product      Product        @relation(fields: [product_id], references: [id])
-  StockHistory StockHistory[]
+  product product @relation(fields: [product_id], references: [id])
 
-  @@index([product_id])
+  @@index([id, product_id])
 }
 
-enum OrderStatus {
+enum STOCK_HISTORY_TYPE {
+  INPUT
+  OUT_SALES
+  REJECT
+}
+
+model stock_history {
+  id            String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  stock_id      String             @db.Uuid
+  history_type  STOCK_HISTORY_TYPE @default(OUT_SALES)
+  notes         String
+  amount        Int                @default(0)
+  external_id   String?
+  created_at    DateTime           @default(now())
+  updated_at    DateTime           @default(now()) @updatedAt
+  created_by_id String             @db.Uuid
+  created_by    user               @relation(fields: [created_by_id], references: [id])
+
+  @@index([id, stock_id, external_id])
+}
+
+enum ORDER_STATUS {
   PENDING
-  SUCCESS
-  CANCEL
-}
-
-model Order {
-  id           String   @id @default(uuid()) @db.Uuid
-  user_id      String
-  order_number String   @unique
-  amount       Float
-  notes        String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  status_id    String
-
-  User        User        @relation(fields: [user_id], references: [id])
-  OrderStatus OrderStatus @default(PENDING)
-  OrderItem   OrderItem[]
-  Payment     Payment?
-  Shipping    Shipping?
-
-  @@index([order_number, id, user_id])
-}
-
-model OrderItem {
-  id            String   @id @default(uuid()) @db.Uuid
-  order_id      String
-  product_id    String
-  amount        Float
-  price_product Float
-  qty           Int
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-
-  Order   Order   @relation(fields: [order_id], references: [id])
-  Product Product @relation(fields: [product_id], references: [id])
-
-  @@index([order_id, id])
-}
-
-enum ShippingStatus {
-  PENDING
-  SUCCESS
-  CANCEL
-}
-
-model Shipping {
-  id              String   @id @default(uuid()) @db.Uuid
-  order_id        String   @unique
-  receive_address String
-  receive_email   String
-  receive_name    String
-  receive_phone   String
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-  status_id       String
-
-  Order          Order          @relation(fields: [order_id], references: [id])
-  ShippingStatus ShippingStatus @default(PENDING)
-
-  @@index([order_id, id, ShippingStatus])
-}
-
-enum PaymentStatus {
-  PENDING
+  ON_PROCESS
   FAILED
-  SUCCESS
   CANCEL
+  DONE
+}
+
+model order {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id      String       @db.Uuid
+  order_no     String       @unique
+  amount       Int          @default(0)
+  notes        String
+  order_status ORDER_STATUS @default(PENDING)
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @default(now()) @updatedAt
+  user         user         @relation(fields: [user_id], references: [id])
+  order_item   order_item[]
+  shipping     shipping[]
+  payment      payment[]
+
+  @@index([id, user_id, order_no])
+}
+
+model order_item {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id      String   @db.Uuid
+  product_id    String   @db.Uuid
+  amount        Int      @default(0)
+  product_price Int      @default(0)
+  qty           Int      @default(0)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now()) @updatedAt
+
+  order   order   @relation(fields: [order_id], references: [id])
+  product product @relation(fields: [product_id], references: [id])
+
+  @@index([id, order_id, product_id])
+}
+
+enum SHIPPING_STATUS {
+  PENDING
+  DONE
+  FAILED
+}
+
+model shipping {
+  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id        String          @db.Uuid
+  receive_address String?
+  receive_email   String?
+  receive_name    String?
+  receive_phone   String?
+  shipping_status SHIPPING_STATUS @default(PENDING)
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @default(now()) @updatedAt
+  order           order           @relation(fields: [order_id], references: [id])
+
+  @@index([id, order_id])
+}
+
+enum PAYMENT_STATUS {
   UNPAID
+  FAILED
+  CANCEL
   PAID
-  REFUND
 }
 
-enum PaymenMethod {
-  CREDIT
-  BANK
-  EWALLET
+enum PAYMENT_METHOD {
+  BANK_TRANSFER
   CASH
+  EWALLET
 }
 
-model Payment {
-  id                     String   @id @default(uuid())
-  order_id               String   @unique
-  amount                 Float
-  created_at             DateTime @default(now())
-  updated_at             DateTime @updatedAt
-  notes                  String?
-  payment_image          String?
-  payment_image_media_id String?
+model payment {
+  id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id         String         @db.Uuid
+  amount           Int            @default(0)
+  payment_status   PAYMENT_STATUS @default(UNPAID)
+  payment_method   PAYMENT_METHOD @default(BANK_TRANSFER)
+  notes            String?
+  payment_image    String?
+  payment_image_id String?
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @default(now()) @updatedAt
+  order            order          @relation(fields: [order_id], references: [id])
 
-  Order         Order         @relation(fields: [order_id], references: [id])
-  PaymentStatus PaymentStatus @default(UNPAID)
-  PaymenMethod  PaymenMethod  @default(BANK)
-
-  @@index([order_id, id, PaymentStatus])
+  @@index([id, order_id, payment_status])
 }

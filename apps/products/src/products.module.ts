@@ -1,6 +1,6 @@
+import { ProductsController } from '@app/products/products.controller';
+import { ProductsService } from '@app/products/products.service';
 import { Module } from '@nestjs/common';
-import { ProductsController } from './products.controller';
-import { ProductsService } from './products.service';
 
 @Module({
   imports: [],
