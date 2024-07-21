@@ -29,5 +29,6 @@
     "**/apps/*/src/main.ts": "${filename}-${dirname(1)}",
     "**/apps/*/Dockerfile": "${filename}-${dirname}",
     "**/apps/*/.env": "${filename}-${dirname}"
-  }
+  },
+  "cSpell.words": ["nats", "Pino"]
 }

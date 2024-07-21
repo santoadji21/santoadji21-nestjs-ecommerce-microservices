@@ -3,6 +3,8 @@ entryPoints:
     address: ':80'
   dashboard:
     address: ':8081'
+  nats:
+    address: ':8082'
 
 api:
   dashboard: true
