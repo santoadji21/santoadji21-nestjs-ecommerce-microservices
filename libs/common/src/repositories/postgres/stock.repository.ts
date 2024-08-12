@@ -1,11 +1,11 @@
-import { PrismaPostgresService } from '@app/common/database/postgres';
-import { Injectable } from '@nestjs/common';
+import { PrismaPostgresService } from "@app/common/database/postgres";
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class StockRepository {
-  constructor(private prismaService: PrismaPostgresService) {}
+	constructor(private prismaService: PrismaPostgresService) {}
 
-  get table() {
-    return this.prismaService.stock;
-  }
+	get table() {
+		return this.prismaService.stock;
+	}
 }

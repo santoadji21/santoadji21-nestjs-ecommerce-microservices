@@ -1,34 +1,39 @@
 {
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  },
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.preferences.importModuleSpecifier": "non-relative",
-  "editor.formatOnSave": true,
-  "files.autoSave": "off",
-  "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    "**/Thumbs.db": true,
-    "**/.classpath": true,
-    "**/.project": true,
-    "**/.settings": true,
-    "**/.factorypath": true,
-    "**/node_modules": true,
-    "**/dist": true
-  },
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "[prisma]": {
-    "editor.defaultFormatter": "Prisma.prisma"
-  },
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  "workbench.editor.customLabels.patterns": {
-    "**/apps/*/src/main.ts": "${filename}-${dirname(1)}",
-    "**/apps/*/Dockerfile": "${filename}-${dirname}",
-    "**/apps/*/.env": "${filename}-${dirname}"
-  },
-  "cSpell.words": ["nats", "Pino"]
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit",
+		"source.organizeImports.biome": "explicit",
+		"quickfix.biome": "explicit"
+	},
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"typescript.preferences.importModuleSpecifier": "non-relative",
+	"editor.formatOnSave": true,
+
+	"files.autoSave": "off",
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/CVS": true,
+		"**/.DS_Store": true,
+		"**/Thumbs.db": true,
+		"**/.classpath": true,
+		"**/.project": true,
+		"**/.settings": true,
+		"**/.factorypath": true,
+		"**/node_modules": true,
+		"**/dist": true
+	},
+	"editor.defaultFormatter": "biomejs.biome",
+	"prettier.enable": false,
+	"eslint.enable": false,
+	"[prisma]": {
+		"editor.defaultFormatter": "Prisma.prisma"
+	},
+	"typescript.enablePromptUseWorkspaceTsdk": true,
+	"workbench.editor.customLabels.patterns": {
+		"**/apps/*/src/main.ts": "${filename}-${dirname(1)}",
+		"**/apps/*/Dockerfile": "${filename}-${dirname}",
+		"**/apps/*/.env": "${filename}-${dirname}"
+	},
+	"cSpell.words": ["nats", "openapi", "Pino"]
 }

@@ -1,0 +1,28 @@
+{
+	"linter": {
+		"rules": {
+			"correctness": {
+				"noUnusedVariables": {
+					"level": "error",
+					"fix": "none"
+				}
+			},
+			"style": {
+				"useConst": {
+					"level": "warn",
+					"fix": "unsafe"
+				},
+				"useImportType": "off",
+				"useTemplate": {
+					"level": "warn",
+					"fix": "safe"
+				}
+			}
+		}
+	},
+	"javascript": {
+		"parser": {
+			"unsafeParameterDecoratorsEnabled": true
+		}
+	}
+}

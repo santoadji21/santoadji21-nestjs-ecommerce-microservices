@@ -1,96 +1,102 @@
 {
-  "name": "nestjs-ecommerce-microservices",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
-  "scripts": {
-    "build": "nest build",
-    "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "nest start --watch -r tsconfig-paths/register",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/apps/nestjs-ecommerce-microservices/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./apps/nestjs-ecommerce-microservices/test/jest-e2e.json",
-    "prepare": "husky"
-  },
-  "dependencies": {
-    "@nestjs/common": "^10.0.0",
-    "@nestjs/core": "^10.0.0",
-    "@nestjs/microservices": "^10.3.10",
-    "@nestjs/platform-express": "^10.0.0",
-    "@prisma/client": "5.16.1",
-    "nestjs-pino": "^4.1.0",
-    "pino-http": "^10.2.0",
-    "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
-  },
-  "lint-staged": {
-    "**/*.ts": [
-      "eslint --fix",
-      "prettier --write"
-    ]
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^19.3.0",
-    "@commitlint/config-conventional": "^19.2.2",
-    "@nestjs/cli": "^10.0.0",
-    "@nestjs/config": "^3.2.3",
-    "@nestjs/schematics": "^10.0.0",
-    "@nestjs/testing": "^10.0.0",
-    "@types/express": "^4.17.17",
-    "@types/jest": "^29.5.2",
-    "@types/node": "^20.3.1",
-    "@types/supertest": "^6.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "eslint": "^8.42.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.0",
-    "husky": "^9.0.11",
-    "jest": "^29.5.0",
-    "lint-staged": "^15.2.7",
-    "pino-pretty": "^11.2.1",
-    "prettier": "^3.0.0",
-    "prisma": "^5.16.1",
-    "source-map-support": "^0.5.21",
-    "supertest": "^6.3.3",
-    "ts-jest": "^29.1.0",
-    "ts-loader": "^9.4.3",
-    "ts-node": "^10.9.1",
-    "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.1.3",
-    "zod": "^3.23.8"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": ".",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "./coverage",
-    "testEnvironment": "node",
-    "roots": [
-      "<rootDir>/apps/",
-      "<rootDir>/libs/"
-    ],
-    "moduleNameMapper": {
-      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
-      "^@app/logger(|/.*)$": "<rootDir>/libs/logger/src/$1"
-    }
-  }
+	"name": "nestjs-ecommerce-microservices",
+	"version": "0.0.1",
+	"description": "",
+	"author": "",
+	"private": true,
+	"license": "UNLICENSED",
+	"scripts": {
+		"build": "nest build",
+		"format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
+		"start": "nest start",
+		"start:dev": "nest start --watch -r tsconfig-paths/register",
+		"start:debug": "nest start --debug --watch",
+		"start:prod": "node dist/apps/nestjs-ecommerce-microservices/main",
+		"lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+		"test": "jest",
+		"test:watch": "jest --watch",
+		"test:cov": "jest --coverage",
+		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+		"test:e2e": "jest --config ./apps/nestjs-ecommerce-microservices/test/jest-e2e.json",
+		"prepare": "husky"
+	},
+	"dependencies": {
+		"@asteasolutions/zod-to-openapi": "^7.1.1",
+		"@nestjs/common": "^10.3.10",
+		"@nestjs/core": "^10.3.10",
+		"@nestjs/microservices": "^10.3.10",
+		"@nestjs/platform-express": "^10.3.10",
+		"@nestjs/swagger": "^7.4.0",
+		"@prisma/client": "5.18.0",
+		"dayjs": "^1.11.12",
+		"express": "^4.19.2",
+		"nestjs-pino": "^4.1.0",
+		"pino-http": "^10.2.0",
+		"reflect-metadata": "^0.2.2",
+		"rxjs": "^7.8.1"
+	},
+	"lint-staged": {
+		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+			"biome check --files-ignore-unknown=true",
+			"biome check --write --no-errors-on-unmatched",
+			"biome check --write --organize-imports-enabled=false --no-errors-on-unmatched",
+			"biome check --write --unsafe --no-errors-on-unmatched",
+			"biome format --write --no-errors-on-unmatched",
+			"biome lint --write --no-errors-on-unmatched"
+		],
+		"*": [
+			"biome check --no-errors-on-unmatched --files-ignore-unknown=true"
+		]
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.8.3",
+		"@commitlint/cli": "^19.4.0",
+		"@commitlint/config-conventional": "^19.2.2",
+		"@nestjs/cli": "^10.4.4",
+		"@nestjs/config": "^3.2.3",
+		"@nestjs/schematics": "^10.1.3",
+		"@nestjs/testing": "^10.3.10",
+		"@types/express": "^4.17.21",
+		"@types/jest": "^29.5.12",
+		"@types/node": "^20.14.15",
+		"@types/supertest": "^6.0.2",
+		"husky": "^9.1.4",
+		"jest": "^29.7.0",
+		"lint-staged": "^15.2.8",
+		"pino-pretty": "^11.2.2",
+		"prisma": "^5.18.0",
+		"source-map-support": "^0.5.21",
+		"supertest": "^6.3.4",
+		"ts-jest": "^29.2.4",
+		"ts-loader": "^9.5.1",
+		"ts-node": "^10.9.2",
+		"tsconfig-paths": "^4.2.0",
+		"typescript": "^5.5.4",
+		"zod": "^3.23.8"
+	},
+	"jest": {
+		"moduleFileExtensions": [
+			"js",
+			"json",
+			"ts"
+		],
+		"rootDir": ".",
+		"testRegex": ".*\\.spec\\.ts$",
+		"transform": {
+			"^.+\\.(t|j)s$": "ts-jest"
+		},
+		"collectCoverageFrom": [
+			"**/*.(t|j)s"
+		],
+		"coverageDirectory": "./coverage",
+		"testEnvironment": "node",
+		"roots": [
+			"<rootDir>/apps/",
+			"<rootDir>/libs/"
+		],
+		"moduleNameMapper": {
+			"^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+			"^@app/logger(|/.*)$": "<rootDir>/libs/logger/src/$1"
+		}
+	}
 }
