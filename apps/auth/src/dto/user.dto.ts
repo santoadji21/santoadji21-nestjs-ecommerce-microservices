@@ -44,8 +44,6 @@ export const UserResponseDtoSchema = CreateUserDtoSchema.omit({
 
 export type UserResponseDto = z.infer<typeof UserResponseDtoSchema>;
 
-export type UserLoginDto = Pick<CreateUserDto, "email" | "password">;
-
-export type UserRegisterDto = Pick<CreateUserDto, "email" | "password">;
+export type UserLoginDto = z.infer<typeof LoginUserDtoSchema>;
 
 export type UpdateUserDto = Partial<CreateUserDto>;
