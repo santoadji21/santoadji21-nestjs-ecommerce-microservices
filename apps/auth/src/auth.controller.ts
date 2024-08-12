@@ -2,6 +2,10 @@ import { AuthService } from "@app/auth/auth.service";
 import { CreateUserDto, CreateUserDtoSchema } from "@app/auth/dto/user.dto";
 import { JwtAuthGuard } from "@app/auth/guards/jwt-auth.guard";
 import { LocalAuthGuard } from "@app/auth/guards/local-auth.guard";
+import {
+	LoginUserExample,
+	RegisterUserExample,
+} from "@app/auth/swagger/example";
 import { excludePassword } from "@app/auth/utils/auth.utils";
 import { UserDto } from "@app/common/auth/jwt-auth.guard";
 import { CurrentUser } from "@app/common/decorators";
@@ -39,10 +43,7 @@ export class AuthController {
 		status: HttpStatus.OK,
 		description: "The record has been successfully created.",
 		schema: {
-			example: {
-				data: true,
-				message: "success",
-			},
+			example: RegisterUserExample,
 		},
 	})
 	@HttpCode(HttpStatus.OK)
@@ -58,6 +59,17 @@ export class AuthController {
 		};
 	}
 
+	@ApiOperation({
+		summary: "Login user",
+		description: "Login user",
+	})
+	@ApiResponse({
+		status: HttpStatus.OK,
+		description: "The login has been successfully.",
+		schema: {
+			example: LoginUserExample,
+		},
+	})
 	@HttpCode(HttpStatus.OK)
 	@UseGuards(LocalAuthGuard)
 	@Post("login")

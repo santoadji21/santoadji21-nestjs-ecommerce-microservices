@@ -1,4 +1,7 @@
-import { CreateUserDtoSchema } from "@app/auth/dto/user.dto";
+import {
+	CreateUserDtoSchema,
+	LoginUserDtoSchema,
+} from "@app/auth/dto/user.dto";
 import {
 	OpenAPIRegistry,
 	OpenApiGeneratorV3,
@@ -8,7 +11,8 @@ import { DocumentBuilder, OpenAPIObject } from "@nestjs/swagger";
 export function getSwaggerConfig(): OpenAPIObject {
 	// Create a registry and register your schemas
 	const registry = new OpenAPIRegistry();
-	registry.register("CreateUserDto", CreateUserDtoSchema);
+	registry.register("Register", CreateUserDtoSchema);
+	registry.register("Login", LoginUserDtoSchema);
 
 	// Generate the OpenAPI components from zod-to-openapi
 	const generator = new OpenApiGeneratorV3(registry.definitions);

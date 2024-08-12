@@ -1,5 +1,5 @@
 import { AuthModule } from "@app/auth/auth.module";
-import { getSwaggerConfig } from "@app/auth/swagger.config";
+import { getSwaggerConfig } from "@app/auth/swagger/swagger.config";
 import { HttpExceptionFilter } from "@app/common/filters/http-exception/http-exception.filter";
 import { NestFactory } from "@nestjs/core";
 import { SwaggerModule } from "@nestjs/swagger";

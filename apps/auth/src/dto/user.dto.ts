@@ -32,6 +32,11 @@ export const CreateUserDtoSchema = z
 	.openapi("CreateUserDto")
 	.strict();
 
+export const LoginUserDtoSchema = CreateUserDtoSchema.pick({
+	email: true,
+	password: true,
+}).openapi("LoginUserDto");
+
 export type CreateUserDto = z.infer<typeof CreateUserDtoSchema>;
 export const UserResponseDtoSchema = CreateUserDtoSchema.omit({
 	password: true,
