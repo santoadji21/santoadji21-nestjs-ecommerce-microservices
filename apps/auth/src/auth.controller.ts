@@ -124,4 +124,10 @@ export class AuthController {
 			throw new UnauthorizedException("Invalid token");
 		}
 	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get("nats")
+	async testNats(@CurrentUser() user: User) {
+		return this.authService.userNotification(user);
+	}
 }

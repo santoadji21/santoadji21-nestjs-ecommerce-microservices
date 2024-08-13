@@ -1,15 +1,19 @@
 import { CreateUserDto, UserLoginDto } from "@app/auth/dto/user.dto";
 import { AuthEnvService } from "@app/auth/env/env.service";
 import { comparePasswords, excludePassword } from "@app/auth/utils/auth.utils";
+import { EVENTS } from "@app/common/constants/events/events";
+import { NOTIFICATION_SERVICE } from "@app/common/constants/services/services";
 import { PostgresRepositoriesService } from "@app/common/repositories/postgres/postgres.repositories.service";
 import { TokenPayload } from "@app/common/schemas/token.schema";
 import {
 	BadRequestException,
+	Inject,
 	Injectable,
 	InternalServerErrorException,
 	UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { ClientProxy } from "@nestjs/microservices";
 import { user as User } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
 import dayjs from "dayjs";
@@ -21,6 +25,8 @@ export class AuthService {
 		private readonly repos: PostgresRepositoriesService,
 		private jwtService: JwtService,
 		private readonly authEnvService: AuthEnvService,
+		@Inject(NOTIFICATION_SERVICE)
+		private readonly notificationClient: ClientProxy,
 	) {}
 	//Register new User
 	async register(data: CreateUserDto) {
@@ -144,5 +150,10 @@ export class AuthService {
 
 	verifyToken(token: string) {
 		return this.jwtService.verify(token);
+	}
+
+	userNotification(user: User) {
+		this.notificationClient.emit(EVENTS.USER_NOTIFICATION, user);
+		return { data: user, message: "User notification sent" };
 	}
 }

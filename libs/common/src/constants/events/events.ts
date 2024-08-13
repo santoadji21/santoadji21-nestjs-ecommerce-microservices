@@ -1,0 +1,3 @@
+export enum EVENTS {
+	USER_NOTIFICATION = "USER_NOTIFICATION",
+}
