@@ -7,9 +7,9 @@ import {
 	RegisterUserExample,
 } from "@app/auth/swagger/example";
 import { excludePassword } from "@app/auth/utils/auth.utils";
-import { UserDto } from "@app/common/auth/jwt-auth.guard";
 import { CurrentUser } from "@app/common/decorators";
 import { ZodValidation } from "@app/common/decorators/zod.decorator";
+import { TokenPayload } from "@app/common/schemas/token.schema";
 import {
 	Body,
 	Controller,
@@ -19,6 +19,7 @@ import {
 	NotFoundException,
 	Post,
 	Res,
+	UnauthorizedException,
 	UseGuards,
 } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
@@ -103,7 +104,24 @@ export class AuthController {
 	}
 
 	@MessagePattern("authenticate")
-	async authenticate(@Payload() data: UserDto) {
-		return data.id;
+	async authenticate(
+		@Payload() data: { Authentication: string },
+	): Promise<TokenPayload> {
+		try {
+			const payload = this.authService.verifyToken(data.Authentication);
+			const user: TokenPayload = {
+				id: payload.id,
+				email: payload.email,
+				user_level: payload.user_level,
+			};
+
+			if (!user) {
+				throw new UnauthorizedException("Invalid token");
+			}
+
+			return user;
+		} catch {
+			throw new UnauthorizedException("Invalid token");
+		}
 	}
 }

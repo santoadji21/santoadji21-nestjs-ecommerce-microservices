@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 @Injectable()
-export class EnvService {
+export class AuthEnvService {
 	constructor(private configService: ConfigService<Env, true>) {}
 
 	get<T extends keyof Env>(key: T) {

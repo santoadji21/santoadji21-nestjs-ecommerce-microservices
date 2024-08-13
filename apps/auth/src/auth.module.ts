@@ -1,7 +1,7 @@
 import { AuthController } from "@app/auth/auth.controller";
 import { AuthService } from "@app/auth/auth.service";
 import { envSchema } from "@app/auth/env/env";
-import { EnvModule } from "@app/auth/env/env.module";
+import { AuthEnvModule } from "@app/auth/env/env.module";
 import { InterceptorsModule } from "@app/auth/modules/interceptors.module";
 import { JwtConfigModule } from "@app/auth/modules/jwt-config.module";
 import { JwtStrategy } from "@app/auth/strategies/jwt.strategy";
@@ -14,7 +14,7 @@ import { ConfigModule } from "@nestjs/config";
 
 @Module({
 	imports: [
-		EnvModule,
+		AuthEnvModule,
 		JwtConfigModule,
 		InterceptorsModule,
 		ConfigModule.forRoot({

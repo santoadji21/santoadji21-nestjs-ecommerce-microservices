@@ -1,4 +1,4 @@
-import { TokenPayload } from "@app/auth/schema/token.schema";
+import { TokenPayload } from "@app/common/schemas/token.schema";
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";

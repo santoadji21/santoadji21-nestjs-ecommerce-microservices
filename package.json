@@ -28,6 +28,7 @@
 		"@nestjs/platform-express": "^10.3.10",
 		"@nestjs/swagger": "^7.4.0",
 		"@prisma/client": "5.18.0",
+		"cookie-parser": "^1.4.6",
 		"dayjs": "^1.11.12",
 		"express": "^4.19.2",
 		"nestjs-pino": "^4.1.0",

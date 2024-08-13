@@ -1,10 +1,10 @@
-import { EnvService } from "@app/auth/env/env.service";
+import { AuthEnvService } from "@app/auth/env/env.service";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 
 @Module({
 	imports: [ConfigModule],
-	providers: [EnvService],
-	exports: [EnvService],
+	providers: [AuthEnvService],
+	exports: [AuthEnvService],
 })
-export class EnvModule {}
+export class AuthEnvModule {}

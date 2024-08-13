@@ -80,21 +80,21 @@ services:
   #   networks:
   #     - alkahfistore-network
 
-  # products:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/products/Dockerfile
-  #     target: development
-  #   container_name: alkahfistore-products
-  #   command: "sh -c 'pnpm prisma generate; pnpm start:dev products'"
-  #   env_file:
-  #     - ./apps/products/.env
-  #   volumes:
-  #     - .:/usr/src/app
-  #   depends_on:
-  #     - postgres
-  #   networks:
-  #     - alkahfistore-network
+  products:
+    build:
+      context: .
+      dockerfile: ./apps/products/Dockerfile
+      target: development
+    container_name: alkahfistore-products
+    command: "sh -c 'pnpm prisma generate; pnpm start:dev products'"
+    env_file:
+      - ./apps/products/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - postgres
+    networks:
+      - alkahfistore-network
 
   # shipping:
   #   build:

@@ -1,8 +1,8 @@
 import { CreateUserDto, UserLoginDto } from "@app/auth/dto/user.dto";
-import { EnvService } from "@app/auth/env/env.service";
-import { TokenPayload } from "@app/auth/schema/token.schema";
+import { AuthEnvService } from "@app/auth/env/env.service";
 import { comparePasswords, excludePassword } from "@app/auth/utils/auth.utils";
 import { PostgresRepositoriesService } from "@app/common/repositories/postgres/postgres.repositories.service";
+import { TokenPayload } from "@app/common/schemas/token.schema";
 import {
 	BadRequestException,
 	Injectable,
@@ -20,7 +20,7 @@ export class AuthService {
 	constructor(
 		private readonly repos: PostgresRepositoriesService,
 		private jwtService: JwtService,
-		private readonly envService: EnvService,
+		private readonly authEnvService: AuthEnvService,
 	) {}
 	//Register new User
 	async register(data: CreateUserDto) {
@@ -69,10 +69,11 @@ export class AuthService {
 		const tokenPayload: TokenPayload = {
 			id: user.id,
 			email: user.email,
+			user_level: user.user_level,
 		};
 
 		const expires = new Date();
-		const expiresDate = this.envService.get("JWT_EXPIRATION_TIME");
+		const expiresDate = this.authEnvService.get("JWT_EXPIRATION_TIME");
 
 		expires.setSeconds(expires.getSeconds() + Number(expiresDate));
 
@@ -141,7 +142,7 @@ export class AuthService {
 		return excludePassword(user);
 	}
 
-	verifyToken(token: string): Promise<unknown> {
+	verifyToken(token: string) {
 		return this.jwtService.verify(token);
 	}
 }

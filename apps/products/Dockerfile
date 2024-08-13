@@ -13,6 +13,16 @@ COPY nest-cli.json nest-cli.json
 # Install pnpm
 RUN npm install -g pnpm
 
+# Copy Prisma schema and generate client
+COPY prisma ./prisma/
+
+# Install dependencies
+RUN pnpm install
+
+# Generate Prisma Client
+RUN pnpm prisma generate
+RUN pnpm prisma generate --schema ./prisma/schema.mongo.prisma
+
 # Install dependencies
 RUN pnpm install
 
