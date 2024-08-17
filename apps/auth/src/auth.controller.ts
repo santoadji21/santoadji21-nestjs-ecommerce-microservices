@@ -1,5 +1,7 @@
 import { AuthService } from "@app/auth/auth.service";
 import { CreateUserDto, CreateUserDtoSchema } from "@app/auth/dto/user.dto";
+import ForgotPassword from "@app/auth/email/forgot-password";
+import { AuthEnvService } from "@app/auth/env/env.service";
 import { JwtAuthGuard } from "@app/auth/guards/jwt-auth.guard";
 import { LocalAuthGuard } from "@app/auth/guards/local-auth.guard";
 import {
@@ -9,6 +11,7 @@ import {
 import { excludePassword } from "@app/auth/utils/auth.utils";
 import { CurrentUser } from "@app/common/decorators";
 import { ZodValidation } from "@app/common/decorators/zod.decorator";
+import { EmailService } from "@app/common/email/email.service";
 import { TokenPayload } from "@app/common/schemas/token.schema";
 import {
 	Body,
@@ -18,12 +21,13 @@ import {
 	HttpStatus,
 	NotFoundException,
 	Post,
+	Query,
 	Res,
 	UnauthorizedException,
 	UseGuards,
 } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { user as User } from "@prisma/client";
 import { Response } from "express";
 import { InjectPinoLogger, PinoLogger } from "nestjs-pino";
@@ -34,6 +38,8 @@ export class AuthController {
 	constructor(
 		@InjectPinoLogger() private readonly logger: PinoLogger,
 		private readonly authService: AuthService,
+		private readonly emailService: EmailService,
+		private readonly authEnv: AuthEnvService,
 	) {}
 
 	@ApiOperation({
@@ -129,5 +135,34 @@ export class AuthController {
 	@Get("nats")
 	async testNats(@CurrentUser() user: User) {
 		return this.authService.userNotification(user);
+	}
+
+	@ApiOperation({
+		summary: "Send forgot password",
+		description: "Send forgot password via email",
+	})
+	@ApiParam({ name: "email" })
+	@HttpCode(HttpStatus.OK)
+	@Get("forgot-password")
+	async SendForgotPasswordEmail(@Query("email") email) {
+		const data = await this.authService.sendForgotPasswordEmail(email);
+		const user = await this.authService.getUserByEmail(email);
+		if (!user) {
+			throw new NotFoundException("User not found");
+		}
+		this.emailService.sendMail({
+			email: email,
+			template: ForgotPassword({
+				user: `${user?.name}`,
+				url: `${this.authEnv.get("FRONTEND_URL")}/reset-password/${data.token}`,
+			}),
+			subject: "Reset password",
+			source: `${this.authEnv.get("SES_EMAIL_SOURCE")}`,
+		});
+
+		return {
+			data,
+			message: "Send forgot password successfully",
+		};
 	}
 }

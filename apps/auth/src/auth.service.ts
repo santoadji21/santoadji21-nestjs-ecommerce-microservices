@@ -16,7 +16,7 @@ import { JwtService } from "@nestjs/jwt";
 import { ClientProxy } from "@nestjs/microservices";
 import { user as User } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
-import dayjs from "dayjs";
+import * as dayjs from "dayjs";
 import { Response } from "express";
 
 @Injectable()
@@ -24,7 +24,7 @@ export class AuthService {
 	constructor(
 		private readonly repos: PostgresRepositoriesService,
 		private jwtService: JwtService,
-		private readonly authEnvService: AuthEnvService,
+		private readonly authEnv: AuthEnvService,
 		@Inject(NOTIFICATION_SERVICE)
 		private readonly notificationClient: ClientProxy,
 	) {}
@@ -79,7 +79,7 @@ export class AuthService {
 		};
 
 		const expires = new Date();
-		const expiresDate = this.authEnvService.get("JWT_EXPIRATION_TIME");
+		const expiresDate = this.authEnv.get("JWT_EXPIRATION_TIME");
 
 		expires.setSeconds(expires.getSeconds() + Number(expiresDate));
 
@@ -103,6 +103,11 @@ export class AuthService {
 	// Get user profile
 	async profile(id: string) {
 		return await this.repos.userRepository.getUserById(id);
+	}
+
+	// Get user by email
+	async getUserByEmail(email: string) {
+		return await this.repos.userRepository.getUserByEmail(email);
 	}
 
 	// Send email

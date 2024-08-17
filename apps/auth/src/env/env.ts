@@ -10,6 +10,13 @@ export const authEnvSchema = z
 		JWT_EXPIRATION_TIME: z.coerce.number().or(z.string()),
 		JWT_SECRET: z.string(),
 		TCP_PORT: z.coerce.number().optional().default(3001),
+		AWS_REGION: z.string().default("ap-southeast-1"),
+		AWS_ACCESS_KEY_ID: z.string(),
+		AWS_SECRET_ACCESS_KEY: z.string(),
+		SES_EMAIL_SOURCE: z.string().email({ message: "Invalid email address" }),
+		FRONTEND_URL: z.string().url({
+			message: "Invalid domain",
+		}),
 	})
 	.merge(globalEnvSchema);
 
