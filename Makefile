@@ -1,4 +1,4 @@
-.PHONY: app-product app-auth app-payment app-notification up down proxy-up proxy-down net init plan apply destroy set-cluster rm-volume
+.PHONY: app-product app-auth app-payment app-notification up down proxy-up proxy-down net init-k8s init-ses plan apply destroy set-cluster rm-volume k8s ses show
 
 #Step to run microservices
 up:
@@ -31,12 +31,27 @@ app-notification:
 	docker build -t alkahfi-store:notification ./apps/notifications/Dockerfile .
 
 
-#Make EKS Aws Cluster
-init:
-	terraform -chdir='./terraform' init 
+#Make Aws Service 
+show: 
+	terraform -chdir='./terraform' workspace show
 
-plan:
-	terraform -chdir='./terraform' plan
+k8s:
+	terraform -chdir='./terraform' workspace select k8s
+
+ses:
+	terraform -chdir='./terraform' workspace select ses
+
+init-k8s:
+	terraform -chdir='./terraform/k8s' init 
+
+init-ses:
+	terraform -chdir='./terraform/ses' init
+
+plan-k8s:
+	terraform -chdir='./terraform/k8s' plan 
+
+plan-ses:
+	terraform -chdir='./terraform/ses' plan
 
 apply:
 	terraform -chdir='./terraform' apply -auto-approve
