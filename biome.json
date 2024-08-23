@@ -24,5 +24,8 @@
 		"parser": {
 			"unsafeParameterDecoratorsEnabled": true
 		}
+	},
+	"files": {
+		"ignore": ["node_modules", ".next", "tmp", "**/mongoose*.ts"]
 	}
 }

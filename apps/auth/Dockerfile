@@ -21,7 +21,6 @@ RUN pnpm install
 
 # Generate Prisma Client
 RUN pnpm prisma generate
-RUN pnpm prisma generate --schema ./prisma/schema.mongo.prisma
 
 # Copy the source code to the container
 COPY apps/auth apps/auth

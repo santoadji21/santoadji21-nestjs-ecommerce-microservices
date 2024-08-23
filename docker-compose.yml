@@ -5,7 +5,7 @@ services:
       dockerfile: ./apps/auth/Dockerfile
       target: development
     container_name: alkahfistore-auth
-    command: "sh -c 'pnpm prisma generate; pnpm prisma generate --schema prisma/schema.mongo.prisma; pnpm start:dev auth'"
+    command: "sh -c 'pnpm prisma generate; pnpm start:dev auth'"
     env_file:
       - ./apps/auth/.env
     volumes:
@@ -16,53 +16,54 @@ services:
     networks:
       - alkahfistore-network
 
-  # orders:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/orders/Dockerfile
-  #     target: development
-  #   container_name: alkahfistore-orders
-  #   command: "sh -c 'pnpm prisma generate; pnpm start:dev orders'"
-  #   env_file:
-  #     - ./apps/orders/.env
-  #   volumes:
-  #     - .:/usr/src/app
-  #   depends_on:
-  #     - postgres
-  #   networks:
-  #     - alkahfistore-network
+  orders:
+    build:
+      context: .
+      dockerfile: ./apps/orders/Dockerfile
+      target: development
+    container_name: alkahfistore-orders
+    command: "sh -c 'pnpm prisma generate; pnpm start:dev orders'"
+    env_file:
+      - ./apps/orders/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - postgres
+    networks:
+      - alkahfistore-network
 
-  # medias:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/medias/Dockerfile
-  #     target: development
-  #   container_name: alkahfistore-medias
-  #   command: pnpm run start:dev medias
-  #   env_file:
-  #     - ./apps/medias/.env
-  #   volumes:
-  #     - .:/usr/src/app
-  #   depends_on:
-  #     - minio
-  #   networks:
-  #     - alkahfistore-network
+  medias:
+    build:
+      context: .
+      dockerfile: ./apps/medias/Dockerfile
+      target: development
+    container_name: alkahfistore-medias
+    command: "pnpm start:dev medias"
+    env_file:
+      - ./apps/medias/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - minio
+      - mongo
+    networks:
+      - alkahfistore-network
 
-  # payments:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/payments/Dockerfile
-  #     target: development
-  #   container_name: alkahfistore-payments
-  #   command: "sh -c 'pnpm prisma generate; pnpm start:dev payments'"
-  #   env_file:
-  #     - ./apps/payments/.env
-  #   volumes:
-  #     - .:/usr/src/app
-  #   depends_on:
-  #     - postgres
-  #   networks:
-  #     - alkahfistore-network
+  payments:
+    build:
+      context: .
+      dockerfile: ./apps/payments/Dockerfile
+      target: development
+    container_name: alkahfistore-payments
+    command: "sh -c 'pnpm prisma generate; pnpm start:dev payments'"
+    env_file:
+      - ./apps/payments/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - postgres
+    networks:
+      - alkahfistore-network
 
   notifications:
     build:
@@ -70,49 +71,48 @@ services:
       dockerfile: ./apps/notifications/Dockerfile
       target: development
     container_name: alkahfistore-notifications
-    command: "sh -c 'pnpm prisma generate; pnpm prisma generate --schema prisma/schema.mongo.prisma; pnpm start:dev notifications'"
+    command: "sh -c 'pnpm prisma generate; pnpm start:dev notifications'"
     env_file:
       - ./apps/notifications/.env
     volumes:
       - .:/usr/src/app
     depends_on:
       - nats
-      # - mongo
     networks:
       - alkahfistore-network
 
-  # products:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/products/Dockerfile
-  #     target: development
-  #   container_name: alkahfistore-products
-  #   command: "sh -c 'pnpm prisma generate; pnpm start:dev products'"
-  #   env_file:
-  #     - ./apps/products/.env
-  #   volumes:
-  #     - .:/usr/src/app
-  #   depends_on:
-  #     - auth
-  #     - postgres
-  #   networks:
-  #     - alkahfistore-network
+  products:
+    build:
+      context: .
+      dockerfile: ./apps/products/Dockerfile
+      target: development
+    container_name: alkahfistore-products
+    command: "sh -c 'pnpm prisma generate; pnpm start:dev products'"
+    env_file:
+      - ./apps/products/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - auth
+      - postgres
+    networks:
+      - alkahfistore-network
 
-  # shipping:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/shipping/Dockerfile
-  #     target: development
-  #   container_name: alkahfistore-shipping
-  #   command: "sh -c 'pnpm prisma generate; pnpm start:dev shipping'"
-  #   env_file:
-  #     - ./apps/shipping/.env
-  #   volumes:
-  #     - .:/usr/src/app
-  #   depends_on:
-  #     - postgres
-  #   networks:
-  #     - alkahfistore-network
+  shipping:
+    build:
+      context: .
+      dockerfile: ./apps/shipping/Dockerfile
+      target: development
+    container_name: alkahfistore-shipping
+    command: "sh -c 'pnpm prisma generate; pnpm start:dev shipping'"
+    env_file:
+      - ./apps/shipping/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - postgres
+    networks:
+      - alkahfistore-network
 
   # Traefik
   traefik:
@@ -129,11 +129,11 @@ services:
       - alkahfistore-network
     depends_on:
       - auth
-      # - orders
-      # - medias
+      - orders
+      - medias
       # - payments
       - notifications
-      # - products
+      - products
       # - shipping
     restart: always
 
@@ -152,21 +152,21 @@ services:
     networks:
       - alkahfistore-network
 
-  # # MongoDB
-  # mongo:
-  #   image: mongo
-  #   container_name: mongo
-  #   ports:
-  #     - '27017:27017'
-  #   environment:
-  #     - MONGO_INITDB_ROOT_USERNAME=root
-  #     - MONGO_INITDB_ROOT_PASSWORD=example
-  #   volumes:
-  #     - mongo-data:/data/db
-  #   networks:
-  #     - alkahfistore-network
+  # MongoDB
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - '27017:27017'
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=alkahfistore
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - alkahfistore-network
 
-  # # NATS
+  # NATS
   nats:
     image: nats:latest
     container_name: nats
@@ -184,39 +184,40 @@ services:
       - 'traefik.http.routers.nats.service=nats'
       - 'traefik.http.routers.nats.entrypoints=nats'
 
-  # #Redis
-  # redis:
-  #   image: redis:latest
-  #   container_name: redis_container
-  #   ports:
-  #     - '6379:6379'
-  #   volumes:
-  #     - redis_data:/data
-  #   environment:
-  #     - REDIS_PASSWORD=alkahfistore
-  #   command: ['redis-server', '--requirepass', '$$REDIS_PASSWORD']
-  #   restart: always
-  #   healthcheck:
-  #     test: ['CMD', 'redis-cli', 'ping']
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
+  #Redis
+  redis:
+    image: redis:latest
+    container_name: redis_container
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    environment:
+      - REDIS_PASSWORD=alkahfistore
+    command: ['redis-server', '--requirepass', '$$REDIS_PASSWORD']
+    restart: always
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
-  # #Minio
-  # minio:
-  #   image: minio/minio
-  #   container_name: minio
-  #   volumes:
-  #     - minio-data:/data
-  #   ports:
-  #     - '9002:9000'
-  #     - '9001:9001'
-  #   environment:
-  #     MINIO_ROOT_USER: minio
-  #     MINIO_ROOT_PASSWORD: miniopassword
-  #   command: server /data --console-address ":9001"
-  #   networks:
-  #     - alkahfistore-network
+  #Minio
+  minio:
+    image: minio/minio
+    container_name: minio
+    volumes:
+      - minio-data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: "minioadmin"
+      MINIO_ROOT_PASSWORD: "minioadmin"
+      MINIO_DEFAULT_BUCKETS: "ecommerce"
+    command: server /data --console-address ":9001"
+    networks:
+      - alkahfistore-network
 
 networks:
   alkahfistore-network:
