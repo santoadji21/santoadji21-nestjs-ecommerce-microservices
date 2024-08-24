@@ -1,4 +1,4 @@
-.PHONY: app-product app-auth app-payment app-notification up down proxy-up proxy-down net init-k8s init-ses plan apply destroy set-cluster rm-volume k8s ses show
+.PHONY: app-product app-auth app-payment app-notification up down proxy-up proxy-down net init-k8s init-ses plan-k8s plan-ses apply-k8s apply-ses destroy-k8s destroy-ses set-cluster rm-volume k8s ses show 
 
 #Step to run microservices
 up:
@@ -53,11 +53,17 @@ plan-k8s:
 plan-ses:
 	terraform -chdir='./terraform/ses' plan
 
-apply:
-	terraform -chdir='./terraform' apply -auto-approve
+apply-k8s:
+	terraform -chdir='./terraform/k8s' apply -auto-approve
 
-destroy:
+apply-ses:
+	terraform -chdir='./terraform/ses' apply -auto-approve
+
+destroy-k8s:
 	terraform -chdir='./terraform' destroy -auto-approve
+
+destroy-ses:
+	terraform -chdir='./terraform/ses' destroy -auto-approve
 
 set-cluster:
 	aws eks --region $(terraform -chdir='./terraform' output -raw region) update-kubeconfig --name $(terraform -chdir='./terraform' output -raw cluster_name)

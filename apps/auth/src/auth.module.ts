@@ -3,13 +3,13 @@ import { AuthService } from "@app/auth/auth.service";
 import { authEnvSchema } from "@app/auth/env/env";
 import { AuthEnvModule } from "@app/auth/env/env.module";
 import { AuthEnvService } from "@app/auth/env/env.service";
-import { InterceptorsModule } from "@app/auth/modules/interceptors.module";
 import { JwtConfigModule } from "@app/auth/modules/jwt-config.module";
 import { JwtStrategy } from "@app/auth/strategies/jwt.strategy";
 import { LocalStrategy } from "@app/auth/strategies/local.strategy";
 import { NOTIFICATION_SERVICE } from "@app/common/constants/services/services";
 import { PrismaPostgresModule } from "@app/common/database/postgres";
 import { EmailModule } from "@app/common/email/email.module";
+import { ResponseInterceptorsModule } from "@app/common/interceptors/response/response.module";
 import { PinoCustomLoggerModule } from "@app/common/logger/pino-custom-logger.module";
 import { PostgresRepositoriesModule } from "@app/common/repositories/postgres/postgres.repository.module";
 import { Module } from "@nestjs/common";
@@ -20,7 +20,7 @@ import { ClientsModule, Transport } from "@nestjs/microservices";
 	imports: [
 		AuthEnvModule,
 		JwtConfigModule,
-		InterceptorsModule,
+		ResponseInterceptorsModule,
 		ConfigModule.forRoot({
 			validate: (env) => authEnvSchema.parse(env),
 			isGlobal: true,

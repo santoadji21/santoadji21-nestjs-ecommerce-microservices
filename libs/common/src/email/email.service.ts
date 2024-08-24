@@ -60,11 +60,11 @@ export class EmailService {
 
 		try {
 			const result = await this.ses.sendEmail(params);
-			this.logger.info("Email sent successfully", result);
+			this.logger.info(`${subject} sent successfully`, result);
 			return result;
 		} catch (error) {
-			this.logger.error("Failed to send email", error);
-			throw new Error("Failed to send email");
+			this.logger.error(`Failed to send ${subject} email`, error);
+			throw new Error(`Failed to send ${subject} email`);
 		}
 	}
 }

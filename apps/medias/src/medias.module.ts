@@ -1,26 +1,20 @@
-import { InterceptorsModule } from "@app/auth/modules/interceptors.module";
 import { S3Module } from "@app/common/aws/s3/s3.module";
-import { DbMongooseModule } from "@app/common/database/mongo/mongoose.module";
+import { ResponseInterceptorsModule } from "@app/common/interceptors/response/response.module";
 import { PinoCustomLoggerModule } from "@app/common/logger/pino-custom-logger.module";
-import {
-	MediaDocument,
-	MediaSchema,
-} from "@app/medias/document/medias.document";
 import { mediasEnvSchema } from "@app/medias/env/env";
 import { MediasEnvModule } from "@app/medias/env/env.module";
 import { MediasEnvService } from "@app/medias/env/env.service";
 import { MediasController } from "@app/medias/medias.controller";
 import { MediasService } from "@app/medias/medias.service";
-import { MediaRepository } from "@app/medias/repository/media.repository";
+import { MediasDatabaseModule } from "@app/medias/modules/medias.database.module";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { MongooseModuleOptions } from "@nestjs/mongoose";
 
 @Module({
 	imports: [
 		MediasEnvModule,
-		InterceptorsModule,
 		PinoCustomLoggerModule,
+		ResponseInterceptorsModule,
 		ConfigModule.forRoot({
 			validate: (env) => mediasEnvSchema.parse(env),
 			isGlobal: true,
@@ -38,33 +32,10 @@ import { MongooseModuleOptions } from "@nestjs/mongoose";
 				forcePathStyle: true,
 			}),
 		}),
-		DbMongooseModule.registerAsync<MediasEnvService>(
-			[MediasEnvModule],
-			[MediasEnvService],
-			(mediasEnvService: MediasEnvService) => {
-				const uri = mediasEnvService.get("MONGO_URI");
-				return {
-					uri,
-					...({
-						useNewUrlParser: true,
-						useUnifiedTopology: true,
-					} as Partial<MongooseModuleOptions>),
-					options: {
-						authSource: "admin",
-						auth: {
-							username: mediasEnvService.get("MONGO_USER"),
-							password: mediasEnvService.get("MONGO_PASSWORD"),
-						},
-					},
-				};
-			},
-		),
-		DbMongooseModule.forFeature([
-			{ name: MediaDocument.name, schema: MediaSchema },
-		]),
+		MediasDatabaseModule,
 	],
 	controllers: [MediasController],
-	providers: [MediasService, MediaRepository],
-	exports: [MediasService, MediaRepository],
+	providers: [MediasService],
+	exports: [MediasService],
 })
 export class MediasModule {}

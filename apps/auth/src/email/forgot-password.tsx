@@ -36,7 +36,7 @@ const ForgotPassword = ({ url, user }: EmailProps) => {
 				<Container className="bg-white px-4 pb-4 rounded">
 					<Img
 						className="w-32 pt-4"
-						src="https://res.cloudinary.com/dqjnvq4gv/image/upload/v1723890843/alkahfi-full_h90oxg.png"
+						src="https://res.cloudinary.com/dqjnvq4gv/image/upload/v1724451506/alkahfi-new_cc1rrm.png"
 					/>
 					<Hr />
 					<Section>
@@ -64,7 +64,7 @@ const ForgotPassword = ({ url, user }: EmailProps) => {
 
 					<Hr />
 					<Section>
-						<Text className="text-xs text-gray-500 leading-none m-2">
+						<Text className="text-xs text-gray-500 leading-none">
 							www.alkahfistore.com
 						</Text>
 					</Section>

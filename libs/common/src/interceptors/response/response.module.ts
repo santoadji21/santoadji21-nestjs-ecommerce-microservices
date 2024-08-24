@@ -10,4 +10,4 @@ import { APP_INTERCEPTOR } from "@nestjs/core";
 		},
 	],
 })
-export class InterceptorsModule {}
+export class ResponseInterceptorsModule {}

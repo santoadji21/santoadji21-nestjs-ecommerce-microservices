@@ -1,4 +1,4 @@
-import { createReadStream, existsSync, unlinkSync } from "node:fs";
+import { createReadStream, existsSync, rmdirSync, unlinkSync } from "node:fs";
 import { Readable } from "node:stream";
 import { S3Service } from "@app/common/aws/s3/s3.service";
 import { UploadImageDto } from "@app/medias/dto/upload-image.dto";
@@ -7,7 +7,6 @@ import {
 	Body,
 	Controller,
 	Delete,
-	Get,
 	InternalServerErrorException,
 	Param,
 	Post,
@@ -16,7 +15,6 @@ import {
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiOperation, ApiParam } from "@nestjs/swagger";
-import { Express } from "express";
 import { diskStorage } from "multer";
 import { InjectPinoLogger, PinoLogger } from "nestjs-pino";
 
@@ -33,8 +31,13 @@ export class MediasController {
 			storage: diskStorage({
 				destination: "./uploads",
 				filename: (_req, file, cb) => {
-					const filename = `${new Date().getTime()}-${file.originalname}`;
-					cb(null, filename);
+					try {
+						const filename = `${new Date().getTime()}-${file.originalname}`;
+						cb(null, filename);
+					} catch (err) {
+						console.log(err);
+						cb(err, "");
+					}
 				},
 			}),
 		}),
@@ -61,21 +64,26 @@ export class MediasController {
 					unlinkSync(file.path);
 				}
 			}
+
+			this.logger.info("Upload image success ", upload);
+			rmdirSync("./uploads", { recursive: true });
+			this.logger.info("Remove local temporary upload image ", "./uploads");
 			return {
 				data: await this.mediasService.create(data),
-				message: "upload image success",
+				message: "Upload Image Success",
 			};
 		}
 		throw new InternalServerErrorException("Upload image error");
 	}
 
-	@ApiParam({ name: "media_id" })
+	@ApiParam({ name: "id" })
 	@ApiOperation({ summary: "Remove media by id" })
-	@Delete("/:media_id")
-	async remove(@Param("media_id") media_id) {
-		const removeMedia = await this.mediasService.removeMedia(media_id);
+	@Delete("remove/:id")
+	async remove(@Param("id") id) {
+		await this.mediasService.removeMedia(id);
+		this.logger.info("Remove media success ", id);
 		return {
-			data: removeMedia,
+			data: {},
 			message: "Remove media success",
 		};
 	}

@@ -37,6 +37,16 @@ export const LoginUserDtoSchema = CreateUserDtoSchema.pick({
 	password: true,
 }).openapi("LoginUserDto");
 
+export const UpdatePasswordDtoSchema = CreateUserDtoSchema.pick({
+	password: true,
+})
+	.extend({
+		token: z.string({
+			message: "Invalid token",
+		}),
+	})
+	.openapi("UpdatePasswordDto");
+
 export type CreateUserDto = z.infer<typeof CreateUserDtoSchema>;
 export const UserResponseDtoSchema = CreateUserDtoSchema.omit({
 	password: true,
@@ -47,3 +57,5 @@ export type UserResponseDto = z.infer<typeof UserResponseDtoSchema>;
 export type UserLoginDto = z.infer<typeof LoginUserDtoSchema>;
 
 export type UpdateUserDto = Partial<CreateUserDto>;
+
+export type UpdatePasswordDto = z.infer<typeof UpdatePasswordDtoSchema>;

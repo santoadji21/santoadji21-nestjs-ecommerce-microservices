@@ -40,4 +40,12 @@ export class ForgotPasswordRepository {
 			},
 		});
 	}
+
+	async findByToken(token: string) {
+		return await this.table.findFirst({
+			where: {
+				token: token,
+			},
+		});
+	}
 }

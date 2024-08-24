@@ -17,6 +17,7 @@ export const authEnvSchema = z
 		FRONTEND_URL: z.string().url({
 			message: "Invalid domain",
 		}),
+		SALT_ROUNDS: z.coerce.number().default(10),
 	})
 	.merge(globalEnvSchema);
 
