@@ -23,11 +23,11 @@ RUN pnpm install
 RUN pnpm prisma generate
 
 # Copy the source code to the container
-COPY apps/auth apps/auth
+COPY apps/user apps/user
 COPY libs libs
 
 # Build the application
-RUN pnpm run build auth
+RUN pnpm run build user
 
 # Stage 2: Production the application
 FROM node:20-alpine as production

@@ -1,7 +1,7 @@
-import { AuthModule } from "@app/auth/auth.module";
-import { AuthEnvService } from "@app/auth/env/env.service";
-import { getSwaggerConfig } from "@app/auth/swagger/swagger.config";
 import { HttpExceptionFilter } from "@app/common/filters/http-exception/http-exception.filter";
+import { UserEnvService } from "@app/user/env/env.service";
+import { getSwaggerConfig } from "@app/user/swagger/swagger.config";
+import { UserModule } from "@app/user/user.module";
 import { NestFactory } from "@nestjs/core";
 import { Transport } from "@nestjs/microservices";
 import { SwaggerModule } from "@nestjs/swagger";
@@ -9,8 +9,8 @@ import * as cookieParser from "cookie-parser";
 import { Logger } from "nestjs-pino";
 
 async function bootstrap() {
-	const app = await NestFactory.create(AuthModule);
-	const authEnv = app.get(AuthEnvService);
+	const app = await NestFactory.create(UserModule);
+	const authEnv = app.get(UserEnvService);
 	// Parse cookies
 	app.use(cookieParser());
 

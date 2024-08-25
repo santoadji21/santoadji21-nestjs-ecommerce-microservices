@@ -1,7 +1,7 @@
 import { globalEnvSchema } from "@app/common/env/env";
 import { z } from "zod";
 
-export const authEnvSchema = z
+export const userEnvSchema = z
 	.object({
 		PORT: z.coerce.number().optional().default(3000),
 		DATABASE_URL: z.string().url({
@@ -21,4 +21,4 @@ export const authEnvSchema = z
 	})
 	.merge(globalEnvSchema);
 
-export type AuthEnv = z.infer<typeof authEnvSchema>;
+export type UserEnv = z.infer<typeof userEnvSchema>;

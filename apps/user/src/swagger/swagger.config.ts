@@ -1,7 +1,7 @@
 import {
 	CreateUserDtoSchema,
 	LoginUserDtoSchema,
-} from "@app/auth/dto/user.dto";
+} from "@app/user/dto/user.dto";
 import {
 	OpenAPIRegistry,
 	OpenApiGeneratorV3,

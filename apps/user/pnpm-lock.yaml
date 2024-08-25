@@ -8,15 +8,15 @@ dependencies:
   '@nestjs/jwt':
     specifier: ^10.2.0
     version: 10.2.0(@nestjs/common@10.3.10)
+  '@nestjs/mapped-types':
+    specifier: '*'
+    version: 2.0.5(@nestjs/common@10.3.10)(reflect-metadata@0.2.2)
   '@nestjs/passport':
     specifier: ^10.0.3
     version: 10.0.3(@nestjs/common@10.3.10)(passport@0.7.0)
   bcryptjs:
     specifier: ^2.4.3
     version: 2.4.3
-  cookie-parser:
-    specifier: ^1.4.6
-    version: 1.4.6
   passport:
     specifier: ^0.7.0
     version: 0.7.0
@@ -70,6 +70,23 @@ packages:
       '@nestjs/common': 10.3.10(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@types/jsonwebtoken': 9.0.5
       jsonwebtoken: 9.0.2
+    dev: false
+
+  /@nestjs/mapped-types@2.0.5(@nestjs/common@10.3.10)(reflect-metadata@0.2.2):
+    resolution: {integrity: sha512-bSJv4pd6EY99NX9CjBIyn4TVDoSit82DUZlL4I3bqNfy5Gt+gXTa86i3I/i0iIV9P4hntcGM5GyO+FhZAhxtyg==}
+    peerDependencies:
+      '@nestjs/common': ^8.0.0 || ^9.0.0 || ^10.0.0
+      class-transformer: ^0.4.0 || ^0.5.0
+      class-validator: ^0.13.0 || ^0.14.0
+      reflect-metadata: ^0.1.12 || ^0.2.0
+    peerDependenciesMeta:
+      class-transformer:
+        optional: true
+      class-validator:
+        optional: true
+    dependencies:
+      '@nestjs/common': 10.3.10(reflect-metadata@0.2.2)(rxjs@7.8.1)
+      reflect-metadata: 0.2.2
     dev: false
 
   /@nestjs/passport@10.0.3(@nestjs/common@10.3.10)(passport@0.7.0):
@@ -186,23 +203,6 @@ packages:
 
   /buffer-equal-constant-time@1.0.1:
     resolution: {integrity: sha512-zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA==}
-    dev: false
-
-  /cookie-parser@1.4.6:
-    resolution: {integrity: sha512-z3IzaNjdwUC2olLIB5/ITd0/setiaFMLYiZJle7xg5Fe9KWAceil7xszYfHHBtDFYLSgJduS2Ty0P1uJdPDJeA==}
-    engines: {node: '>= 0.8.0'}
-    dependencies:
-      cookie: 0.4.1
-      cookie-signature: 1.0.6
-    dev: false
-
-  /cookie-signature@1.0.6:
-    resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
-    dev: false
-
-  /cookie@0.4.1:
-    resolution: {integrity: sha512-ZwrFkGJxUR3EIoXtO+yVE69Eb7KlixbaeAWfBQB9vVsNn/o+Yw69gBWSSDK825hQNdN+wF8zELf3dFNl/kxkUA==}
-    engines: {node: '>= 0.6'}
     dev: false
 
   /ecdsa-sig-formatter@1.0.11:

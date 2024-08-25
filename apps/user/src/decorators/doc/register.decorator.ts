@@ -1,4 +1,4 @@
-import { RegisterUserExample } from "@app/auth/swagger/example";
+import { RegisterUserExample } from "@app/user/swagger/example";
 import { HttpStatus, applyDecorators } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 

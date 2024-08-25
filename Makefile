@@ -2,7 +2,7 @@
 
 #Step to run microservices
 up:
-	docker compose up --build 
+	docker compose up --build
 
 #Step to stop microservices
 down:

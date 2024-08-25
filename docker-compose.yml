@@ -1,13 +1,13 @@
 services:
-  auth:
+  user:
     build:
       context: .
-      dockerfile: ./apps/auth/Dockerfile
+      dockerfile: ./apps/user/Dockerfile
       target: development
-    container_name: alkahfistore-auth
-    command: "sh -c 'pnpm prisma generate; pnpm start:dev auth'"
+    container_name: alkahfistore-user
+    command: "sh -c 'pnpm prisma generate; pnpm start:dev user'"
     env_file:
-      - ./apps/auth/.env
+      - ./apps/user/.env
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -128,7 +128,7 @@ services:
     networks:
       - alkahfistore-network
     depends_on:
-      - auth
+      - user
       # - orders
       # - medias
       # - payments

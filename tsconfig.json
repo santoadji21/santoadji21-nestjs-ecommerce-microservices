@@ -20,7 +20,7 @@
 		"noFallthroughCasesInSwitch": false,
 		"paths": {
 			"@app/common/*": ["libs/common/src/*"],
-			"@app/auth/*": ["apps/auth/src/*"],
+			"@app/user/*": ["apps/user/src/*"],
 			"@app/products/*": ["apps/products/src/*"],
 			"@app/orders/*": ["apps/orders/src/*"],
 			"@app/medias/*": ["apps/medias/src/*"],

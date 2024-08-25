@@ -1,12 +1,12 @@
 http:
   routers:
-    auth:
-      rule: 'PathPrefix(`/auth`)'
-      service: auth-service
+    user:
+      rule: 'PathPrefix(`/user`)'
+      service: user-service
       entryPoints:
         - web
       middlewares:
-        - strip-auth-prefix
+        - strip-user-prefix
     orders:
       rule: 'PathPrefix(`/orders`)'
       service: orders-service
@@ -51,10 +51,10 @@ http:
         - strip-shipping-prefix
 
   services:
-    auth-service:
+    user-service:
       loadBalancer:
         servers:
-          - url: 'http://auth:3000'
+          - url: 'http://user:3000'
     orders-service:
       loadBalancer:
         servers:
@@ -81,10 +81,10 @@ http:
           - url: 'http://shipping:3000'
 
   middlewares:
-    strip-auth-prefix:
+    strip-user-prefix:
       stripPrefix:
         prefixes:
-          - '/auth'
+          - '/user'
     strip-orders-prefix:
       stripPrefix:
         prefixes:

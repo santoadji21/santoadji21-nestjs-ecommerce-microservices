@@ -1,49 +1,42 @@
-import {
-	CreateUserDto,
-	UpdatePasswordDto,
-	UserLoginDto,
-} from "@app/auth/dto/user.dto";
-import ForgotPassword from "@app/auth/email/forgot-password";
-import SuccessResetPassword from "@app/auth/email/success-reset-password";
-import { AuthEnvService } from "@app/auth/env/env.service";
-import { comparePasswords, excludePassword } from "@app/auth/utils/auth.utils";
+import { CreateUserDto, UpdatePasswordDto } from "@app/user/dto/user.dto";
+import ForgotPassword from "@app/user/email/forgot-password";
+import SuccessResetPassword from "@app/user/email/success-reset-password";
+
 import { EVENTS } from "@app/common/constants/events/events";
 import { NOTIFICATION_SERVICE } from "@app/common/constants/services/services";
 import { EmailService } from "@app/common/email/email.service";
 import { PostgresRepositoriesService } from "@app/common/repositories/postgres/postgres.repositories.service";
-import { TokenPayload } from "@app/common/schemas/token.schema";
+import { excludePassword } from "@app/user/utils/auth.utils";
 import {
 	BadRequestException,
 	Inject,
 	Injectable,
 	InternalServerErrorException,
 	NotFoundException,
-	Res,
-	UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { ClientProxy } from "@nestjs/microservices";
 import { user as User } from "@prisma/client";
+import { UserEnvService } from "apps/user/src/env/env.service";
 import * as bcrypt from "bcryptjs";
 import * as dayjs from "dayjs";
 
-import { Response } from "express";
 import { InjectPinoLogger, PinoLogger } from "nestjs-pino";
 
 @Injectable()
-export class AuthService {
+export class UserService {
 	constructor(
 		private readonly repos: PostgresRepositoriesService,
 		private jwtService: JwtService,
 		private readonly emailService: EmailService,
-		private readonly authEnv: AuthEnvService,
+		private readonly userEnv: UserEnvService,
 		@Inject(NOTIFICATION_SERVICE)
 		private readonly notificationClient: ClientProxy,
 		@InjectPinoLogger() private readonly logger: PinoLogger,
 	) {}
 	//Register new User
 	async register(data: CreateUserDto) {
-		const saltOrRounds = this.authEnv.get("SALT_ROUNDS");
+		const saltOrRounds = this.userEnv.get("SALT_ROUNDS");
 		const hashPassword = await bcrypt.hash(data.password, saltOrRounds);
 		data.password = hashPassword;
 		const checkUser = await this.repos.userRepository.getUserByEmail(
@@ -60,63 +53,6 @@ export class AuthService {
 		} catch (error) {
 			throw new InternalServerErrorException(error);
 		}
-	}
-
-	//Login User
-	async login(data: UserLoginDto) {
-		const checkUser = await this.repos.userRepository.getUserByEmail(
-			data.email,
-		);
-		if (!checkUser) {
-			throw new BadRequestException("User email not found");
-		}
-		const isMatch = await bcrypt.compare(data.password, checkUser.password);
-		if (!isMatch) {
-			throw new BadRequestException("User password not match");
-		}
-		const payload = {
-			id: checkUser.id,
-			name: checkUser.name,
-			email: checkUser.email,
-			userLevel: checkUser.user_level,
-		};
-		const accessToken = await this.jwtService.signAsync(payload);
-		return { accessToken };
-	}
-
-	async loginUser(user: User, response: Response) {
-		const tokenPayload: TokenPayload = {
-			id: user.id,
-			email: user.email,
-			user_level: user.user_level,
-		};
-
-		const expires = new Date();
-		const expiresDate = this.authEnv.get("JWT_EXPIRATION_TIME");
-
-		expires.setSeconds(expires.getSeconds() + Number(expiresDate));
-
-		const token = this.jwtService.sign(tokenPayload);
-
-		response.cookie("Authentication", token, {
-			httpOnly: true,
-			expires,
-		});
-
-		return {
-			user: {
-				id: user.id,
-				email: user.email,
-				user_level: user.user_level,
-			},
-			token,
-		};
-	}
-
-	// Logout
-	async logout(@Res({ passthrough: true }) response: Response) {
-		response.clearCookie("Authentication");
-		return { data: {}, message: "Logout success" };
 	}
 
 	// Get all users
@@ -157,10 +93,10 @@ export class AuthService {
 			email,
 			template: ForgotPassword({
 				user: user.name,
-				url: `${this.authEnv.get("FRONTEND_URL")}/reset-password/${token}`,
+				url: `${this.userEnv.get("FRONTEND_URL")}/reset-password/${token}`,
 			}),
 			subject: "Reset password",
-			source: `${this.authEnv.get("SES_EMAIL_SOURCE")}`,
+			source: `${this.userEnv.get("SES_EMAIL_SOURCE")}`,
 		});
 
 		if (existingForgotPasswordRecord) {
@@ -227,7 +163,7 @@ export class AuthService {
 		);
 		if (!user) throw new BadRequestException("User not found");
 
-		const saltOrRounds = this.authEnv.get("SALT_ROUNDS");
+		const saltOrRounds = this.userEnv.get("SALT_ROUNDS");
 		const hashPassword = await bcrypt.hash(data.password, saltOrRounds);
 
 		const updatePassword = await this.repos.userRepository.updateUser(user.id, {
@@ -239,10 +175,10 @@ export class AuthService {
 			await this.emailService.sendMail({
 				email: user.email,
 				template: SuccessResetPassword({
-					url: `${this.authEnv.get("FRONTEND_URL")}/login`,
+					url: `${this.userEnv.get("FRONTEND_URL")}/login`,
 				}),
 				subject: "Success reset password",
-				source: `${this.authEnv.get("SES_EMAIL_SOURCE")}`,
+				source: `${this.userEnv.get("SES_EMAIL_SOURCE")}`,
 			});
 			return updatePassword;
 		}
@@ -264,24 +200,6 @@ export class AuthService {
 			data: excludePassword(userWithAdmin as User),
 			message: "User removed from admin",
 		};
-	}
-
-	async validateUser(email: string, password: string): Promise<unknown> {
-		const user = await this.repos.userRepository.getUserByEmail(email);
-		if (!user) {
-			throw new UnauthorizedException("Email does not exist");
-		}
-
-		const isPasswordValid = await comparePasswords(password, user.password);
-		if (!isPasswordValid) {
-			throw new UnauthorizedException("Invalid password");
-		}
-
-		return excludePassword(user);
-	}
-
-	verifyToken(token: string) {
-		return this.jwtService.verify(token);
 	}
 
 	userNotification(user: User) {
