@@ -18,6 +18,7 @@ import {
 	Injectable,
 	InternalServerErrorException,
 	NotFoundException,
+	Res,
 	UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
@@ -112,6 +113,17 @@ export class AuthService {
 		};
 	}
 
+	// Logout
+	async logout(@Res({ passthrough: true }) response: Response) {
+		response.clearCookie("Authentication");
+		return { data: {}, message: "Logout success" };
+	}
+
+	// Get all users
+	async allUsers() {
+		return await this.repos.userRepository.getAllUsers();
+	}
+
 	// Get user profile
 	async profile(id: string) {
 		return await this.repos.userRepository.getUserById(id);
@@ -120,6 +132,11 @@ export class AuthService {
 	// Get user by email
 	async getUserByEmail(email: string) {
 		return await this.repos.userRepository.getUserByEmail(email);
+	}
+
+	// Delete user
+	async deleteUser(id: string | string[]) {
+		return await this.repos.userRepository.deleteUser(id);
 	}
 
 	// Send reset password
@@ -230,6 +247,23 @@ export class AuthService {
 			return updatePassword;
 		}
 		throw new InternalServerErrorException("Failed to reset password");
+	}
+	// Assign to admin
+	async assignToAdmin(id: string | string[]) {
+		const userWithAdmin = await this.repos.userRepository.assignToAdmin(id);
+		return {
+			data: excludePassword(userWithAdmin as User),
+			message: "User assigned to admin",
+		};
+	}
+
+	// Remove from admin
+	async removeFromAdmin(id: string | string[]) {
+		const userWithAdmin = await this.repos.userRepository.removeFromAdmin(id);
+		return {
+			data: excludePassword(userWithAdmin as User),
+			message: "User removed from admin",
+		};
 	}
 
 	async validateUser(email: string, password: string): Promise<unknown> {

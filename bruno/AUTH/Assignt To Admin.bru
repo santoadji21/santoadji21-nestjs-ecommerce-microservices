@@ -1,0 +1,17 @@
+meta {
+  name: Assignt To Admin
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{API}}/auth/assign-to-admin
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": "1b58aa07-a711-4ec2-8482-cda63eade2c9"
+  }
+}

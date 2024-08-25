@@ -1,7 +1,6 @@
 import { PrismaPostgresService } from "@app/common/database/postgres";
 import { Injectable } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
-import { USER_LEVEL } from "@prisma/client";
+import { Prisma, USER_LEVEL, user as User } from "@prisma/client";
 
 @Injectable()
 export class UserRepository {
@@ -58,6 +57,84 @@ export class UserRepository {
 				id: id,
 			},
 			data,
+		});
+	}
+
+	// Delete user(s)
+	async deleteUser(id: string | string[]) {
+		if (Array.isArray(id)) {
+			// Bulk delete
+			const deleteResult = await this.table.deleteMany({
+				where: {
+					id: {
+						in: id,
+					},
+				},
+			});
+			return deleteResult.count; // Return the number of deleted records
+		}
+		// Single delete
+		await this.table.delete({
+			where: {
+				id: id,
+			},
+		});
+		return 1; // Return 1 because only one record is deleted
+	}
+
+	// Assign to admin
+	async assignToAdmin(userOrUserUuids: string | string[]) {
+		if (Array.isArray(userOrUserUuids)) {
+			// Bulk update
+
+			return await this.table.updateMany({
+				where: {
+					id: {
+						in: userOrUserUuids,
+					},
+				},
+				data: {
+					user_level: USER_LEVEL.ADMIN,
+				},
+			});
+		}
+
+		// Single Update
+		return await this.table.update({
+			where: {
+				id: userOrUserUuids,
+			},
+			data: {
+				user_level: USER_LEVEL.ADMIN,
+			},
+		});
+	}
+
+	// Unassign from admin
+	async removeFromAdmin(userOrUserUuids: string | string[]) {
+		if (Array.isArray(userOrUserUuids)) {
+			// Bulk update
+
+			return await this.table.updateMany({
+				where: {
+					id: {
+						in: userOrUserUuids,
+					},
+				},
+				data: {
+					user_level: USER_LEVEL.MEMBER,
+				},
+			});
+		}
+
+		// Single Update
+		return await this.table.update({
+			where: {
+				id: userOrUserUuids,
+			},
+			data: {
+				user_level: USER_LEVEL.MEMBER,
+			},
 		});
 	}
 }

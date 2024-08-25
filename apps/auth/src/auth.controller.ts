@@ -1,24 +1,23 @@
 import { AuthService } from "@app/auth/auth.service";
+import { LoginUserDoc } from "@app/auth/decorators/doc/login.decorator";
+import { RegisterUserDoc } from "@app/auth/decorators/doc/register.decorator";
+import { ResetPasswordDoc } from "@app/auth/decorators/doc/reset-password.decorator";
 import {
 	CreateUserDto,
 	CreateUserDtoSchema,
 	UpdatePasswordDto,
 } from "@app/auth/dto/user.dto";
-import { AuthEnvService } from "@app/auth/env/env.service";
 import { JwtAuthGuard } from "@app/auth/guards/jwt-auth.guard";
 import { LocalAuthGuard } from "@app/auth/guards/local-auth.guard";
-import {
-	LoginUserExample,
-	RegisterUserExample,
-} from "@app/auth/swagger/example";
 import { excludePassword } from "@app/auth/utils/auth.utils";
-import { CurrentUser } from "@app/common/decorators";
+import { RoleGuard } from "@app/common/auth/role-auth.guard";
+import { CurrentUser, Roles } from "@app/common/decorators";
 import { ZodValidation } from "@app/common/decorators/zod.decorator";
-import { EmailService } from "@app/common/email/email.service";
 import { TokenPayload } from "@app/common/schemas/token.schema";
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpCode,
 	HttpStatus,
@@ -30,8 +29,8 @@ import {
 	UseGuards,
 } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { user as User } from "@prisma/client";
+import { ApiTags } from "@nestjs/swagger";
+import { USER_LEVEL, user as User } from "@prisma/client";
 import { Response } from "express";
 import { InjectPinoLogger, PinoLogger } from "nestjs-pino";
 
@@ -41,21 +40,9 @@ export class AuthController {
 	constructor(
 		@InjectPinoLogger() private readonly logger: PinoLogger,
 		private readonly authService: AuthService,
-		private readonly emailService: EmailService,
-		private readonly authEnv: AuthEnvService,
 	) {}
 
-	@ApiOperation({
-		summary: "Register user",
-		description: "Register new user",
-	})
-	@ApiResponse({
-		status: HttpStatus.OK,
-		description: "The record has been successfully created.",
-		schema: {
-			example: RegisterUserExample,
-		},
-	})
+	@RegisterUserDoc()
 	@HttpCode(HttpStatus.OK)
 	@Post("register")
 	@ZodValidation(CreateUserDtoSchema)
@@ -69,17 +56,7 @@ export class AuthController {
 		};
 	}
 
-	@ApiOperation({
-		summary: "Login user",
-		description: "Login user",
-	})
-	@ApiResponse({
-		status: HttpStatus.OK,
-		description: "The login has been successfully.",
-		schema: {
-			example: LoginUserExample,
-		},
-	})
+	@LoginUserDoc()
 	@HttpCode(HttpStatus.OK)
 	@UseGuards(LocalAuthGuard)
 	@Post("login")
@@ -92,6 +69,60 @@ export class AuthController {
 			data: userWithToken,
 			message: "Login successfully",
 		};
+	}
+
+	@Post("logout")
+	async logout(
+		@Res({ passthrough: true }) response: Response,
+		@CurrentUser() user: User,
+	) {
+		this.logger.info("Logout user", {
+			userId: user.id,
+			email: user.email,
+		});
+		this.authService.logout(response);
+		return { data: {}, message: "Logout success" };
+	}
+
+	@Get("users")
+	@UseGuards(JwtAuthGuard, RoleGuard)
+	@Roles(USER_LEVEL.ADMIN)
+	async allUsers() {
+		const users = await this.authService.allUsers();
+		this.logger.info("Get all users");
+		const usersWithoutPassword = users.map((user) => {
+			return excludePassword(user);
+		});
+
+		return {
+			data: usersWithoutPassword,
+			message: "Get all users successfully",
+		};
+	}
+	@Delete("users")
+	@UseGuards(JwtAuthGuard, RoleGuard)
+	@Roles(USER_LEVEL.ADMIN)
+	async deleteUser(@Body() { id }: { id: string | string[] }) {
+		const deleteUser = await this.authService.deleteUser(id);
+
+		return {
+			data: {},
+			message: `Delete ${deleteUser} user successfully`,
+		};
+	}
+
+	@Post("assign-to-admin")
+	@UseGuards(JwtAuthGuard, RoleGuard)
+	@Roles(USER_LEVEL.ADMIN)
+	async assignToAdmin(@Body() { id }: { id: string | string[] }) {
+		return await this.authService.assignToAdmin(id);
+	}
+
+	@Post("remove-from-admin")
+	@UseGuards(JwtAuthGuard, RoleGuard)
+	@Roles(USER_LEVEL.ADMIN)
+	async removeFromAdmin(@Body() { id }: { id: string | string[] }) {
+		return await this.authService.removeFromAdmin(id);
 	}
 
 	@Get("profile")
@@ -140,11 +171,6 @@ export class AuthController {
 		return this.authService.userNotification(user);
 	}
 
-	@ApiOperation({
-		summary: "Send reset password",
-		description: "Send reset password via email",
-	})
-	@ApiParam({ name: "email" })
 	@HttpCode(HttpStatus.OK)
 	@Get("reset-password")
 	async sendResetPasswordEmail(@Query("email") email) {
@@ -155,6 +181,7 @@ export class AuthController {
 		};
 	}
 
+	@ResetPasswordDoc()
 	@Post("reset-password")
 	async resetPassword(@Body() data: UpdatePasswordDto) {
 		const result = await this.authService.resetPassword(data);
