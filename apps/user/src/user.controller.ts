@@ -7,6 +7,7 @@ import {
 	CreateUserDto,
 	CreateUserDtoSchema,
 	UpdatePasswordDto,
+	UpdateUserDto,
 } from "@app/user/dto/user.dto";
 import { JwtAuthGuard } from "@app/user/guards/jwt-auth.guard";
 import { UserService } from "@app/user/user.service";
@@ -19,6 +20,7 @@ import {
 	HttpCode,
 	HttpStatus,
 	NotFoundException,
+	Patch,
 	Post,
 	Query,
 	UseGuards,
@@ -64,6 +66,13 @@ export class UserController {
 			message: "Get all users successfully",
 		};
 	}
+
+	@Patch("update")
+	@UseGuards(JwtAuthGuard)
+	async updateUser(@Body() data: UpdateUserDto) {
+		return await this.userService.updateUser(data.id, data);
+	}
+
 	@Delete("delete")
 	@UseGuards(JwtAuthGuard, RoleGuard)
 	@Roles(USER_LEVEL.ADMIN)

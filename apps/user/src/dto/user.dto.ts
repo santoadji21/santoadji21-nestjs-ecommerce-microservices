@@ -56,6 +56,8 @@ export type UserResponseDto = z.infer<typeof UserResponseDtoSchema>;
 
 export type UserLoginDto = z.infer<typeof LoginUserDtoSchema>;
 
-export type UpdateUserDto = Partial<CreateUserDto>;
+export type UpdateUserDto = Partial<CreateUserDto> & {
+	id: string;
+};
 
 export type UpdatePasswordDto = z.infer<typeof UpdatePasswordDtoSchema>;

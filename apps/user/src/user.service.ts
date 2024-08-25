@@ -16,7 +16,7 @@ import {
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { ClientProxy } from "@nestjs/microservices";
-import { user as User } from "@prisma/client";
+import { Prisma, user as User } from "@prisma/client";
 import { UserEnvService } from "apps/user/src/env/env.service";
 import * as bcrypt from "bcryptjs";
 import * as dayjs from "dayjs";
@@ -200,6 +200,12 @@ export class UserService {
 			data: excludePassword(userWithAdmin as User),
 			message: "User removed from admin",
 		};
+	}
+
+	async updateUser(id: string, data: Prisma.userUpdateInput) {
+		const user = await this.repos.userRepository.getUserById(id);
+		if (!user) throw new NotFoundException("User not found");
+		return await this.repos.userRepository.updateUser(id, data);
 	}
 
 	userNotification(user: User) {
