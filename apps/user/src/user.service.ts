@@ -57,22 +57,84 @@ export class UserService {
 
 	// Get all users
 	async allUsers() {
-		return await this.repos.userRepository.getAllUsers();
+		try {
+			this.logger.info("Fetching all users");
+			const users = await this.repos.userRepository.getAllUsers();
+			return users.map((user) => excludePassword(user));
+		} catch (error) {
+			this.logger.error("Error fetching all users", error);
+			throw new InternalServerErrorException("Failed to fetch users");
+		}
 	}
 
-	// Get user profile
+	// Get user profile by ID
 	async profile(id: string) {
-		return await this.repos.userRepository.getUserById(id);
+		try {
+			this.logger.info(`Fetching user profile for ID: ${id}`);
+			const user = await this.repos.userRepository.getUserById(id);
+			if (!user) {
+				this.logger.warn(`User not found for ID: ${id}`);
+				throw new NotFoundException("User not found");
+			}
+			return excludePassword(user);
+		} catch (error) {
+			this.logger.error(`Error fetching profile for ID: ${id}`, error);
+			if (error instanceof NotFoundException) {
+				throw error;
+			}
+			throw new InternalServerErrorException("Failed to fetch user profile");
+		}
 	}
 
 	// Get user by email
 	async getUserByEmail(email: string) {
-		return await this.repos.userRepository.getUserByEmail(email);
+		try {
+			this.logger.info(`Fetching user by email: ${email}`);
+			const user = await this.repos.userRepository.getUserByEmail(email);
+			if (!user) {
+				this.logger.warn(`User not found for email: ${email}`);
+				throw new NotFoundException("User not found");
+			}
+			return excludePassword(user);
+		} catch (error) {
+			this.logger.error(`Error fetching user by email: ${email}`, error);
+			if (error instanceof NotFoundException) {
+				throw error;
+			}
+			throw new InternalServerErrorException("Failed to fetch user by email");
+		}
 	}
 
-	// Delete user
+	// Delete user by ID(s)
 	async deleteUser(id: string | string[]) {
-		return await this.repos.userRepository.deleteUser(id);
+		try {
+			this.logger.info(
+				`Deleting user(s) with ID(s): ${Array.isArray(id) ? id.join(", ") : id}`,
+			);
+			const deleteResult = await this.repos.userRepository.deleteUser(id);
+			const deleteCount = Array.isArray(id) ? deleteResult : 1;
+
+			if (deleteCount === 0) {
+				this.logger.warn(
+					`No user found to delete with ID(s): ${Array.isArray(id) ? id.join(", ") : id}`,
+				);
+				throw new NotFoundException("User(s) not found");
+			}
+
+			return {
+				deleted: deleteCount,
+				message: `Deleted ${deleteCount} user(s) successfully`,
+			};
+		} catch (error) {
+			this.logger.error(
+				`Error deleting user(s) with ID(s): ${Array.isArray(id) ? id.join(", ") : id}`,
+				error,
+			);
+			if (error instanceof NotFoundException) {
+				throw error;
+			}
+			throw new InternalServerErrorException("Failed to delete user(s)");
+		}
 	}
 
 	// Send reset password

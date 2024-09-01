@@ -47,10 +47,29 @@ export const UpdatePasswordDtoSchema = CreateUserDtoSchema.pick({
 	})
 	.openapi("UpdatePasswordDto");
 
-export type CreateUserDto = z.infer<typeof CreateUserDtoSchema>;
 export const UserResponseDtoSchema = CreateUserDtoSchema.omit({
 	password: true,
 });
+
+export const UpdateUserDtoSchema = CreateUserDtoSchema.omit({
+	password: true,
+})
+	.extend({
+		id: z.string().uuid().optional().openapi({
+			example: "1",
+			description: "The id of the user",
+		}),
+	})
+	.optional();
+
+export const DeleteUserSchema = z.object({
+	id: z.union([
+		z.string().uuid({ message: "Invalid user id" }),
+		z.array(z.string().uuid({ message: "Invalid user id" })),
+	]),
+});
+
+export type CreateUserDto = z.infer<typeof CreateUserDtoSchema>;
 
 export type UserResponseDto = z.infer<typeof UserResponseDtoSchema>;
 
@@ -61,3 +80,5 @@ export type UpdateUserDto = Partial<CreateUserDto> & {
 };
 
 export type UpdatePasswordDto = z.infer<typeof UpdatePasswordDtoSchema>;
+
+export type DeleteUserDto = z.infer<typeof DeleteUserSchema>;

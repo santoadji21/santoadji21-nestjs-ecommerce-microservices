@@ -6,8 +6,11 @@ import { ResetPasswordDoc } from "@app/user/decorators/doc/reset-password.decora
 import {
 	CreateUserDto,
 	CreateUserDtoSchema,
+	DeleteUserDto,
+	DeleteUserSchema,
 	UpdatePasswordDto,
 	UpdateUserDto,
+	UpdateUserDtoSchema,
 } from "@app/user/dto/user.dto";
 import { JwtAuthGuard } from "@app/user/guards/jwt-auth.guard";
 import { UserService } from "@app/user/user.service";
@@ -57,18 +60,16 @@ export class UserController {
 	async allUsers() {
 		const users = await this.userService.allUsers();
 		this.logger.info("Get all users");
-		const usersWithoutPassword = users.map((user) => {
-			return excludePassword(user);
-		});
 
 		return {
-			data: usersWithoutPassword,
+			data: users,
 			message: "Get all users successfully",
 		};
 	}
 
 	@Patch("update")
 	@UseGuards(JwtAuthGuard)
+	@ZodValidation(UpdateUserDtoSchema)
 	async updateUser(@Body() data: UpdateUserDto) {
 		return await this.userService.updateUser(data.id, data);
 	}
@@ -76,7 +77,8 @@ export class UserController {
 	@Delete("delete")
 	@UseGuards(JwtAuthGuard, RoleGuard)
 	@Roles(USER_LEVEL.ADMIN)
-	async deleteUser(@Body() { id }: { id: string | string[] }) {
+	@ZodValidation(DeleteUserSchema)
+	async deleteUser(@Body() { id }: DeleteUserDto) {
 		const deleteUser = await this.userService.deleteUser(id);
 
 		return {
@@ -112,7 +114,7 @@ export class UserController {
 			throw new NotFoundException("User not found");
 		}
 		return {
-			data: excludePassword(userProfile),
+			data: userProfile,
 			message: "Get user profile successfully",
 		};
 	}
