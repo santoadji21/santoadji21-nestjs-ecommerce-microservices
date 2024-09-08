@@ -271,7 +271,7 @@ export class UserService {
 	}
 
 	userNotification(user: User) {
-		this.notificationClient.emit(EVENTS.USER_NOTIFICATION, user);
+		this.notificationClient.emit(EVENTS.EMAIL.USER_NOTIFICATION, user);
 		return { data: user, message: "User notification sent" };
 	}
 }

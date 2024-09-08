@@ -16,21 +16,22 @@ services:
     networks:
       - alkahfistore-network
 
-  # orders:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/orders/Dockerfile
-  #     target: development
-  #   container_name: alkahfistore-orders
-  #   command: "sh -c 'pnpm prisma generate; pnpm start:dev orders'"
-  #   env_file:
-  #     - ./apps/orders/.env
-  #   volumes:
-  #     - .:/usr/src/app
-  #   depends_on:
-  #     - postgres
-  #   networks:
-  #     - alkahfistore-network
+  orders:
+    build:
+      context: .
+      dockerfile: ./apps/orders/Dockerfile
+      target: development
+    container_name: alkahfistore-orders
+    command: "sh -c 'pnpm prisma generate; pnpm start:dev orders'"
+    env_file:
+      - ./apps/orders/.env
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - postgres
+    networks:
+      - alkahfistore-network
 
   medias:
     build:
@@ -98,21 +99,40 @@ services:
     networks:
       - alkahfistore-network
 
-  # shipping:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/shipping/Dockerfile
-  #     target: development
-  #   container_name: alkahfistore-shipping
-  #   command: "sh -c 'pnpm prisma generate; pnpm start:dev shipping'"
-  #   env_file:
-  #     - ./apps/shipping/.env
-  #   volumes:
-  #     - .:/usr/src/app
-  #   depends_on:
-  #     - postgres
-  #   networks:
-  #     - alkahfistore-network
+  stock:
+    build:
+      context: .
+      dockerfile: ./apps/stock/Dockerfile
+      target: development
+    container_name: alkahfistore-stock
+    command: "sh -c 'pnpm prisma generate; pnpm start:dev stock'"
+    env_file:
+      - ./apps/stock/.env
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - user
+      - postgres
+      - products
+    networks:
+      - alkahfistore-network
+
+  shipping:
+    build:
+      context: .
+      dockerfile: ./apps/shipping/Dockerfile
+      target: development
+    container_name: alkahfistore-shipping
+    command: "sh -c 'pnpm prisma generate; pnpm start:dev shipping'"
+    env_file:
+      - ./apps/shipping/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - postgres
+    networks:
+      - alkahfistore-network
 
   # Traefik
   traefik:
@@ -129,12 +149,12 @@ services:
       - alkahfistore-network
     depends_on:
       - user
-      # - orders
+      - orders
       - medias
       # - payments
       # - notifications
       - products
-      # - shipping
+      - shipping
       - postgres
       # - mongo
     restart: always

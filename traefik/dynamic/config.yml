@@ -42,6 +42,13 @@ http:
         - web
       middlewares:
         - strip-products-prefix
+    stock:
+      rule: 'PathPrefix(`/stock`)'
+      service: stock-service
+      entryPoints:
+        - web
+      middlewares:
+        - strip-stock-prefix
     shipping:
       rule: 'PathPrefix(`/shipping`)'
       service: shipping-service
@@ -75,6 +82,10 @@ http:
       loadBalancer:
         servers:
           - url: 'http://products:3000'
+    stock-service:
+      loadBalancer:
+        servers:
+          - url: 'http://stock:3000'
     shipping-service:
       loadBalancer:
         servers:
@@ -105,6 +116,11 @@ http:
       stripPrefix:
         prefixes:
           - '/products'
+    strip-stock-prefix:
+      stripPrefix:
+        prefixes:
+          - '/stock'
+
     strip-shipping-prefix:
       stripPrefix:
         prefixes:

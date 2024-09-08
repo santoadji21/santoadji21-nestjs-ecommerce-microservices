@@ -1,4 +1,4 @@
-import { AUTH_SERVICE } from "@app/common/constants/services/services";
+import { SERVICES } from "@app/common/constants/services/services";
 import { TokenPayload } from "@app/common/schemas/token.schema";
 import {
 	CanActivate,
@@ -15,7 +15,9 @@ import { Observable, catchError, map, of, tap } from "rxjs";
 export class JwtAuthGuard implements CanActivate {
 	private readonly logger = new Logger(JwtAuthGuard.name);
 
-	constructor(@Inject(AUTH_SERVICE) private readonly authClient: ClientProxy) {}
+	constructor(
+		@Inject(SERVICES.AUTH) private readonly authClient: ClientProxy,
+	) {}
 
 	canActivate(
 		context: ExecutionContext,

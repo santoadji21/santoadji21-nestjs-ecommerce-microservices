@@ -3,29 +3,43 @@ import { PrismaPostgresModule } from "@app/common/database/postgres";
 import { ResponseInterceptorsModule } from "@app/common/interceptors/response/response.module";
 import { PinoCustomLoggerModule } from "@app/common/logger/pino-custom-logger.module";
 import { PostgresRepositoriesModule } from "@app/common/repositories/postgres/postgres.repository.module";
-import { productEnvSchema } from "@app/products/env/env";
-import { ProductEnvModule } from "@app/products/env/env.module";
-import { ProductEnvService } from "@app/products/env/env.service";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ClientsModule, Transport } from "@nestjs/microservices";
+import { stockEnvSchema } from "apps/stock/src/env/env";
+import { StockEnvModule } from "apps/stock/src/env/env.module";
+import { StockEnvService } from "apps/stock/src/env/env.service";
 
 @Module({
 	imports: [
+		PinoCustomLoggerModule,
 		ConfigModule.forRoot({
-			validate: (env) => productEnvSchema.parse(env),
+			validate: (env) => stockEnvSchema.parse(env),
 			isGlobal: true,
 		}),
 		ClientsModule.registerAsync([
 			{
-				imports: [ProductEnvModule],
-				inject: [ProductEnvService],
+				imports: [StockEnvModule],
+				inject: [StockEnvService],
 				name: SERVICES.AUTH,
-				useFactory: (productEnv: ProductEnvService) => ({
+				useFactory: (stockEnv: StockEnvService) => ({
 					transport: Transport.TCP,
 					options: {
-						host: productEnv.get("AUTH_HOST"),
-						port: productEnv.get("AUTH_PORT"),
+						host: stockEnv.get("AUTH_HOST"),
+						port: stockEnv.get("AUTH_PORT"),
+					},
+				}),
+			},
+			{
+				name: SERVICES.NOTIFICATION,
+				imports: [StockEnvModule],
+				inject: [StockEnvService],
+				useFactory: (stockEnv: StockEnvService) => ({
+					transport: Transport.NATS,
+					options: {
+						servers: [
+							`nats://${stockEnv.get("NATS_HOST")}:${stockEnv.get("NATS_PORT")}`,
+						],
 					},
 				}),
 			},
@@ -33,15 +47,14 @@ import { ClientsModule, Transport } from "@nestjs/microservices";
 		PrismaPostgresModule,
 		PostgresRepositoriesModule,
 		ResponseInterceptorsModule,
-		PinoCustomLoggerModule,
 	],
 	exports: [
+		PinoCustomLoggerModule,
 		PrismaPostgresModule,
 		PostgresRepositoriesModule,
 		ResponseInterceptorsModule,
-		PinoCustomLoggerModule,
 		ConfigModule,
 		ClientsModule,
 	],
 })
-export class CommonProductModule {}
+export class CommonStockModule {}

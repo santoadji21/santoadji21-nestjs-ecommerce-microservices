@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const envSchema = z.object({
+export const productEnvSchema = z.object({
 	PORT: z.coerce.number().optional().default(3000),
 	DATABASE_URL: z.string().url({
 		message: "Invalid database url",
@@ -9,4 +9,4 @@ export const envSchema = z.object({
 	AUTH_PORT: z.coerce.number(),
 });
 
-export type ProductEnv = z.infer<typeof envSchema>;
+export type ProductEnv = z.infer<typeof productEnvSchema>;

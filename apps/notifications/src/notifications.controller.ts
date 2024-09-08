@@ -12,7 +12,7 @@ export class NotificationsController {
 		return this.notificationsService.getHello();
 	}
 
-	@EventPattern(EVENTS.USER_NOTIFICATION)
+	@EventPattern(EVENTS.EMAIL.USER_NOTIFICATION)
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	async userNotification(data: any) {
 		console.log("TEST USER NATS ", data);

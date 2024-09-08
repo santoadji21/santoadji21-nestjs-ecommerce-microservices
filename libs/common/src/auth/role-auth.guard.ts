@@ -2,10 +2,10 @@ import { TokenPayload } from "@app/common/schemas/token.schema";
 import {
 	CanActivate,
 	ExecutionContext,
-	ForbiddenException,
+	HttpException,
+	HttpStatus,
 	Injectable,
 	Logger,
-	UnauthorizedException,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { Observable } from "rxjs";
@@ -30,7 +30,17 @@ export class RoleGuard implements CanActivate {
 
 		if (!user) {
 			this.logger.error("No user found in request.");
-			throw new UnauthorizedException("User is not authenticated.");
+			throw new HttpException(
+				{
+					statusCode: HttpStatus.UNAUTHORIZED,
+					message: "User is not authenticated.",
+					data: null,
+					error: true,
+					errors: null,
+					path: request.url,
+				},
+				HttpStatus.UNAUTHORIZED,
+			);
 		}
 
 		this.logger.debug(`User Role: ${user.user_level}`);
@@ -39,9 +49,18 @@ export class RoleGuard implements CanActivate {
 		if (user.user_level && roles.includes(user.user_level)) {
 			return true;
 		}
-		this.logger.error("User does not have the required role.");
-		throw new ForbiddenException(
-			"You do not have permission to access this resource.",
+
+		this.logger.error("User does not have the required roles.");
+		throw new HttpException(
+			{
+				statusCode: HttpStatus.FORBIDDEN,
+				message: "You do not have permission to access this resource.",
+				data: null,
+				error: true,
+				errors: null,
+				path: request.url,
+			},
+			HttpStatus.FORBIDDEN,
 		);
 	}
 }
