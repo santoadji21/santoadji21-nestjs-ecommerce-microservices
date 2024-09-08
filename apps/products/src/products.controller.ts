@@ -10,16 +10,11 @@ export class ProductsController {
 	constructor(private readonly productsService: ProductsService) {}
 
 	@Get()
-	getHello(): string {
-		return this.productsService.getHello();
-	}
-
-	@Get("test")
-	@UseGuards(JwtAuthGuard, RoleGuard)
-	@Roles(USER_LEVEL.ADMIN)
-	getHello2() {
+	async getAll() {
+		const products = await this.productsService.getAll();
 		return {
-			message: "Hello World!",
+			data: products,
+			message: "get all product active",
 		};
 	}
 }

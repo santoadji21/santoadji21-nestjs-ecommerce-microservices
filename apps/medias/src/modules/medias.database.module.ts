@@ -18,7 +18,6 @@ import { MongooseModule } from "@nestjs/mongoose";
 				const uri = mediasEnvService.get("MONGO_URI");
 				return {
 					uri,
-					useNewUrlParser: true,
 					useUnifiedTopology: true,
 					authSource: "admin",
 					auth: {

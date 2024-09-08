@@ -32,22 +32,22 @@ services:
   #   networks:
   #     - alkahfistore-network
 
-  # medias:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/medias/Dockerfile
-  #     target: development
-  #   container_name: alkahfistore-medias
-  #   command: "pnpm start:dev medias"
-  #   env_file:
-  #     - ./apps/medias/.env
-  #   volumes:
-  #     - .:/usr/src/app
-  #   depends_on:
-  #     - minio
-  #     - mongo
-  #   networks:
-  #     - alkahfistore-network
+  medias:
+    build:
+      context: .
+      dockerfile: ./apps/medias/Dockerfile
+      target: development
+    container_name: alkahfistore-medias
+    command: "pnpm start:dev medias"
+    env_file:
+      - ./apps/medias/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - minio
+      - mongo
+    networks:
+      - alkahfistore-network
 
   # payments:
   #   build:
@@ -65,38 +65,38 @@ services:
   #   networks:
   #     - alkahfistore-network
 
-  # notifications:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/notifications/Dockerfile
-  #     target: development
-  #   container_name: alkahfistore-notifications
-  #   command: "sh -c 'pnpm prisma generate; pnpm start:dev notifications'"
-  #   env_file:
-  #     - ./apps/notifications/.env
-  #   volumes:
-  #     - .:/usr/src/app
-  #   depends_on:
-  #     - nats
-  #   networks:
-  #     - alkahfistore-network
+  notifications:
+    build:
+      context: .
+      dockerfile: ./apps/notifications/Dockerfile
+      target: development
+    container_name: alkahfistore-notifications
+    command: "sh -c 'pnpm prisma generate; pnpm start:dev notifications'"
+    env_file:
+      - ./apps/notifications/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - nats
+    networks:
+      - alkahfistore-network
 
-  # products:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/products/Dockerfile
-  #     target: development
-  #   container_name: alkahfistore-products
-  #   command: "sh -c 'pnpm prisma generate; pnpm start:dev products'"
-  #   env_file:
-  #     - ./apps/products/.env
-  #   volumes:
-  #     - .:/usr/src/app
-  #   depends_on:
-  #     - auth
-  #     - postgres
-  #   networks:
-  #     - alkahfistore-network
+  products:
+    build:
+      context: .
+      dockerfile: ./apps/products/Dockerfile
+      target: development
+    container_name: alkahfistore-products
+    command: "sh -c 'pnpm prisma generate; pnpm start:dev products'"
+    env_file:
+      - ./apps/products/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - user
+      - postgres
+    networks:
+      - alkahfistore-network
 
   # shipping:
   #   build:
@@ -130,10 +130,10 @@ services:
     depends_on:
       - user
       # - orders
-      # - medias
+      - medias
       # - payments
       # - notifications
-      # - products
+      - products
       # - shipping
       - postgres
       # - mongo
@@ -155,18 +155,18 @@ services:
       - alkahfistore-network
 
   # MongoDB
-  # mongo:
-  #   image: mongo
-  #   container_name: mongo
-  #   ports:
-  #     - '27017:27017'
-  #   environment:
-  #     - MONGO_INITDB_ROOT_USERNAME=root
-  #     - MONGO_INITDB_ROOT_PASSWORD=alkahfistore
-  #   volumes:
-  #     - mongo-data:/data/db
-  #   networks:
-  #     - alkahfistore-network
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - '27017:27017'
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=alkahfistore
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - alkahfistore-network
 
   #NATS
   nats:
@@ -205,21 +205,21 @@ services:
   #     retries: 5
 
   #Minio
-  # minio:
-  #   image: minio/minio
-  #   container_name: minio
-  #   volumes:
-  #     - minio-data:/data
-  #   ports:
-  #     - "9000:9000"
-  #     - "9001:9001"
-  #   environment:
-  #     MINIO_ROOT_USER: "minioadmin"
-  #     MINIO_ROOT_PASSWORD: "minioadmin"
-  #     MINIO_DEFAULT_BUCKETS: "ecommerce"
-  #   command: server /data --console-address ":9001"
-  #   networks:
-  #     - alkahfistore-network
+  minio:
+    image: minio/minio
+    container_name: minio
+    volumes:
+      - minio-data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: "minioadmin"
+      MINIO_ROOT_PASSWORD: "minioadmin"
+      MINIO_DEFAULT_BUCKETS: "ecommerce"
+    command: server /data --console-address ":9001"
+    networks:
+      - alkahfistore-network
 
 networks:
   alkahfistore-network:

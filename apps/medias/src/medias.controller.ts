@@ -52,7 +52,7 @@ export class MediasController {
 
 			const name = file.path;
 			const upload = await this.s3.upload(fileLocal, name);
-			data.media_name = file.originalname;
+			data.media_name = file.filename;
 			data.media_path = file.path;
 			data.url = this.s3.publicUrl(file.path);
 			data.media_type = file.mimetype;

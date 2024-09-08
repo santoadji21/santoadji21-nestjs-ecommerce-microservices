@@ -1,0 +1,24 @@
+meta {
+  name: Create
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{API}}/products/admin
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "product_name": "Jeruk Manis",
+    "description": "Jeruk manis",
+    "slug": "Jeruk manis",
+    "price": 10000,
+    "product_image_id": "66dd4d263ce64253b415483d",
+    "product_image": "1725779238576-BP_IMG_2527.jpg",
+    "is_active": true,
+    "created_by_id": "1b58aa07-a711-4ec2-8482-cda63eade2c9"
+  }
+}

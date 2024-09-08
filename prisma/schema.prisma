@@ -53,7 +53,7 @@ model product {
   updated_at       DateTime  @default(now()) @updatedAt
   deleted_at       DateTime?
 
-  created_by user         @relation(fields: [created_by_id], references: [id])
+  created_by user?        @relation(fields: [created_by_id], references: [id])
   stock      stock[]
   order_item order_item[]
 

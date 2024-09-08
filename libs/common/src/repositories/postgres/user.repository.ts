@@ -1,10 +1,18 @@
 import { PrismaPostgresService } from "@app/common/database/postgres";
 import { Injectable } from "@nestjs/common";
-import { Prisma, USER_LEVEL, user as User } from "@prisma/client";
+import { Prisma, USER_LEVEL } from "@prisma/client";
 
 @Injectable()
 export class UserRepository {
 	constructor(private prismaService: PrismaPostgresService) {}
+
+	user_select: Prisma.userSelect = {
+		id: true,
+		name: true,
+		email: true,
+		avatar: true,
+		user_level: true,
+	};
 
 	get table() {
 		return this.prismaService.user;
@@ -33,6 +41,7 @@ export class UserRepository {
 			where: {
 				id: id,
 			},
+			select: this.user_select,
 		});
 	}
 
@@ -41,6 +50,7 @@ export class UserRepository {
 			where: {
 				user_level: level,
 			},
+			select: this.user_select,
 		});
 	}
 

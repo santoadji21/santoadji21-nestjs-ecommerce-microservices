@@ -53,4 +53,4 @@ RUN pnpm install --prod
 COPY --from=development /usr/src/app/dist ./dist
 
 # Run the application
-CMD ["node", "dist/apps/auth/main"]
+CMD ["node", "dist/apps/user/main"]
