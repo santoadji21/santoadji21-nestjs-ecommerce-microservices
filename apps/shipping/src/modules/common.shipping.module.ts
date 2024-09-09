@@ -3,9 +3,9 @@ import { PrismaPostgresModule } from "@app/common/database/postgres";
 import { ResponseInterceptorsModule } from "@app/common/interceptors/response/response.module";
 import { PinoCustomLoggerModule } from "@app/common/logger/pino-custom-logger.module";
 import { PostgresRepositoriesModule } from "@app/common/repositories/postgres/postgres.repository.module";
-import { stockEnvSchema } from "@app/stock/env/env";
-import { StockEnvModule } from "@app/stock/env/env.module";
-import { StockEnvService } from "@app/stock/env/env.service";
+import { shippingEnvSchema } from "@app/shipping/env/env";
+import { ShippingEnvModule } from "@app/shipping/env/env.module";
+import { ShippingEnvService } from "@app/shipping/env/env.service";
 
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
@@ -15,31 +15,31 @@ import { ClientsModule, Transport } from "@nestjs/microservices";
 	imports: [
 		PinoCustomLoggerModule,
 		ConfigModule.forRoot({
-			validate: (env) => stockEnvSchema.parse(env),
+			validate: (env) => shippingEnvSchema.parse(env),
 			isGlobal: true,
 		}),
 		ClientsModule.registerAsync([
 			{
-				imports: [StockEnvModule],
-				inject: [StockEnvService],
+				imports: [ShippingEnvModule],
+				inject: [ShippingEnvService],
 				name: SERVICES.AUTH,
-				useFactory: (stockEnv: StockEnvService) => ({
+				useFactory: (shippingEnv: ShippingEnvService) => ({
 					transport: Transport.TCP,
 					options: {
-						host: stockEnv.get("AUTH_HOST"),
-						port: stockEnv.get("AUTH_PORT"),
+						host: shippingEnv.get("AUTH_HOST"),
+						port: shippingEnv.get("AUTH_PORT"),
 					},
 				}),
 			},
 			{
 				name: SERVICES.NOTIFICATION,
-				imports: [StockEnvModule],
-				inject: [StockEnvService],
-				useFactory: (stockEnv: StockEnvService) => ({
+				imports: [ShippingEnvModule],
+				inject: [ShippingEnvService],
+				useFactory: (shippingEnv: ShippingEnvService) => ({
 					transport: Transport.NATS,
 					options: {
 						servers: [
-							`nats://${stockEnv.get("NATS_HOST")}:${stockEnv.get("NATS_PORT")}`,
+							`nats://${shippingEnv.get("NATS_HOST")}:${shippingEnv.get("NATS_PORT")}`,
 						],
 					},
 				}),
@@ -58,4 +58,4 @@ import { ClientsModule, Transport } from "@nestjs/microservices";
 		ClientsModule,
 	],
 })
-export class CommonStockModule {}
+export class CommonShippingModule {}

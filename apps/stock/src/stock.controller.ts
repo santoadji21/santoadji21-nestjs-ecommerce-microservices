@@ -2,6 +2,8 @@ import { JwtAuthGuard } from "@app/common/auth/jwt-auth.guard";
 import { RoleGuard } from "@app/common/auth/role-auth.guard";
 import { EVENTS } from "@app/common/constants/events/events";
 import { Roles } from "@app/common/decorators";
+import { AddStockDto } from "@app/stock/dto/stock.dto";
+import { StockService } from "@app/stock/stock.service";
 import {
 	Body,
 	Controller,
@@ -13,8 +15,7 @@ import {
 } from "@nestjs/common";
 import { EventPattern } from "@nestjs/microservices";
 import { USER_LEVEL } from "@prisma/client";
-import { AddStockDto } from "apps/stock/src/dto/stock.dto";
-import { StockService } from "apps/stock/src/stock.service";
+
 import { PinoLogger } from "nestjs-pino";
 
 @Controller()

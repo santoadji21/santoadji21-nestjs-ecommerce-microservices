@@ -1,4 +1,4 @@
-.PHONY: app-product app-auth app-payment app-notification up down proxy-up proxy-down net init-k8s init-ses plan-k8s plan-ses apply-k8s apply-ses destroy-k8s destroy-ses set-cluster rm-volume k8s ses show 
+.PHONY: app-product app-auth app-payment app-notification up down proxy-up proxy-down net init-k8s init-ses plan-k8s plan-ses apply-k8s apply-ses destroy-k8s destroy-ses set-cluster rm-volume k8s ses show rmi rm-builder
 
 #Step to run microservices
 up:
@@ -67,6 +67,12 @@ destroy-ses:
 
 set-cluster:
 	aws eks --region $(terraform -chdir='./terraform' output -raw region) update-kubeconfig --name $(terraform -chdir='./terraform' output -raw cluster_name)
+
+rmi:
+	docker images --format "{{.Repository}}:{{.Tag}}" | grep "nestjs-ecommerce-microservices" | xargs docker rmi -f
+
+rm-builder:
+	docker builder prune --all
 
 
 
